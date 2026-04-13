@@ -1,0 +1,414 @@
+.right-sidebar {
+    width: 320px;
+    background-color: white;
+    height: 100vh;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #f3f4f6;
+    overflow-y: auto;
+}
+
+.right-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Profile */
+.profile-section {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.greeting p {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.greeting h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+}
+
+.logout-btn-small {
+    padding: 8px 16px;
+    font-size: 13px;
+    background: #fef2f2;
+    color: #ef4444;
+    border: none;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 600;
+}
+
+.logout-btn-small:hover {
+    background: #fee2e2;
+}
+
+/* Earnings Card */
+.earnings-card {
+    background: #f9fafb;
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 40px;
+    border: 1px solid #f1f5f9;
+}
+
+.earnings-card h3 {
+    font-size: 15px;
+    color: #475569;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.earning-amount {
+    font-size: 42px;
+    font-weight: 800;
+    color: #7c3aed;
+    margin-bottom: 15px;
+    letter-spacing: -1px;
+}
+
+.earning-desc {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 24px;
+    line-height: 1.5;
+    max-width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.withdraw-btn {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #7c3aed;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.withdraw-btn:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Earnings List */
+.earnings-list {
+    margin-bottom: 40px;
+}
+
+.earnings-list h3 {
+    font-size: 16px;
+    color: #334155;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.list-item:hover {
+    transform: translateX(5px);
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.item-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+}
+
+.item-icon.purple {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+.item-icon.green {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.item-icon.red {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+
+.item-info {
+    flex: 1;
+}
+
+.item-info h4 {
+    font-size: 15px;
+    color: #1e293b;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.item-info p {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.item-arrow {
+    color: #cbd5e1;
+}
+
+/* Impression Chart */
+.impression-section {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    border: 1px solid #f8fafc;
+}
+
+.impression-section h3 {
+    font-size: 15px;
+    color: #334155;
+    margin-bottom: 24px;
+    font-weight: 600;
+}
+
+.impression-chart {
+    height: 120px;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding: 0 10px;
+    margin-bottom: 15px;
+}
+
+.imp-bar {
+    width: 20px;
+    border-radius: 10px;
+}
+
+.imp-labels {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10px;
+}
+
+.imp-labels span {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Profile */
+.profile-section {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.greeting p {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.greeting h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.logout-btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.logout-btn-small:hover {
+    background: #fecaca;
+}
+
+/* Earnings Card */
+.earnings-card {
+    background: #fdfafa;
+    border: 1px solid #f3f4f6;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.earnings-card h3 {
+    font-size: 14px;
+    color: #4b5563;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.earning-amount {
+    font-size: 36px;
+    font-weight: 700;
+    color: #7c3aed;
+    /* Purple */
+    margin-bottom: 10px;
+}
+
+.earning-desc {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.withdraw-btn {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #7c3aed;
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.withdraw-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+/* Earnings List */
+.earnings-list {
+    margin-bottom: 30px;
+}
+
+.earnings-list h3 {
+    font-size: 15px;
+    color: #374151;
+    margin-bottom: 15px;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.item-icon.purple {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.item-icon.green {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.item-icon.red {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+
+.item-info {
+    flex: 1;
+}
+
+.item-info h4 {
+    font-size: 14px;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.item-info p {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.item-arrow {
+    color: #d1d5db;
+}
+
+/* Impression Chart */
+.impression-section {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+}
+
+.impression-section h3 {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 20px;
+}
+
+.impression-chart {
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 10px;
+    margin-bottom: 10px;
+}
+
+.imp-bar {
+    width: 12px;
+    border-radius: 6px;
+}
+
+.imp-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px;
+}
+
+.imp-labels span {
+    font-size: 11px;
+    color: #9ca3af;
+}

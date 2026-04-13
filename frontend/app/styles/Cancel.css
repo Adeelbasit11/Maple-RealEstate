@@ -1,0 +1,108 @@
+.cancel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.icon {
+    color: #ef4444;
+    margin-bottom: 24px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+p {
+    font-size: 1.125rem;
+    color: #666;
+    margin-bottom: 32px;
+    max-width: 500px;
+}
+
+.btn-container {
+    display: flex;
+    gap: 16px;
+}
+
+.btn {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.pricing-btn {
+    background: #111;
+    color: #fff;
+}
+
+.home-btn {
+    background: #eee;
+    color: #111;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.skeleton-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+    border-radius: 50%;
+    margin: 0 auto 24px;
+}
+
+.skeleton-title {
+    height: 48px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.skeleton-subtitle {
+    height: 24px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+    border-radius: 8px;
+    margin-bottom: 32px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.skeleton-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.skeleton-button {
+    height: 48px;
+    width: 150px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+    border-radius: 12px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0%; }
+    100% { background-position: -200% 0%; }
+}

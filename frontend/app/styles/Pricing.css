@@ -1,0 +1,247 @@
+.pricing-container {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+}
+
+.pricing-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.pricing-header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.pricing-header p {
+    font-size: 1.25rem;
+    color: #666;
+    text-align: center;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.plan-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 24px;
+    padding: 40px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    border-color: #ddd;
+}
+
+.plan-card.popular {
+    border: 2px solid #a855f7;
+    background: linear-gradient(to bottom, #ffffff, #faf5ff);
+}
+
+.popular-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #a855f7;
+    color: #fff;
+    padding: 4px 16px;
+    border-radius: 99px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.plan-icon {
+    margin-bottom: 24px;
+}
+
+.plan-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.plan-price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.plan-price span {
+    font-size: 1rem;
+    color: #666;
+    font-weight: 400;
+}
+
+.plan-description {
+    color: #666;
+    margin-bottom: 32px;
+    min-height: 48px;
+}
+
+.plan-features {
+    list-style: none;
+    margin-bottom: 40px;
+    flex-grow: 1;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.feature-icon {
+    margin-right: 12px;
+    color: #10b981;
+}
+
+.subscribe-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-blue { 
+    background: #3b82f6; 
+    color: #fff; 
+}
+
+.btn-blue:hover { 
+    background: #2563eb; 
+}
+
+.btn-purple { 
+    background: #a855f7; 
+    color: #fff; 
+}
+
+.btn-purple:hover { 
+    background: #9333ea; 
+}
+
+.btn-amber { 
+    background: #f59e0b; 
+    color: #fff; 
+}
+
+.btn-amber:hover { 
+    background: #d97706; 
+}
+
+.subscribe-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.skeleton-container {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.skeleton-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.skeleton-title {
+    height: 50px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.skeleton-subtitle {
+    height: 24px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+    border-radius: 8px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.skeleton-plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.skeleton-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 24px;
+    padding: 40px;
+    min-height: 500px;
+}
+
+.skeleton-card-content {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.skeleton-icon {
+    height: 40px;
+    margin-bottom: 24px;
+}
+
+.skeleton-name {
+    height: 28px;
+    margin-bottom: 12px;
+}
+
+.skeleton-price {
+    height: 50px;
+    margin-bottom: 16px;
+}
+
+.skeleton-description {
+    height: 48px;
+    margin-bottom: 32px;
+}
+
+.skeleton-features {
+    height: 200px;
+    margin-bottom: 40px;
+}
+
+.skeleton-button {
+    height: 48px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0%; }
+    100% { background-position: -200% 0%; }
+}

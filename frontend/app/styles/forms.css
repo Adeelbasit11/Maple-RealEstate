@@ -1,0 +1,400 @@
+/* ===============================
+   Global Reset & Font
+=============================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.form-body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* .auth-wrapper{
+  border-radius: 2px;
+} */
+
+/* ===============================
+   Auth Card
+=============================== */
+#auth {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  padding: 55px 50px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ===============================
+   Heading
+=============================== */
+#auth h2 {
+  text-align: left;
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+
+#auth .subb-text {
+  text-align: left;
+  font-size: 14px;
+  color: #aaa8a8;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+
+
+/* ===============================
+   Form Groups
+=============================== */
+.form .form-group {
+  margin-bottom: 18px;
+}
+
+.form .form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* Default input style */
+.form .form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background-color: #e6e6e6;
+  color: #111;
+  /* Ensure there is room for icons if present (will be overridden for password-group) */
+}
+
+/* Placeholder color */
+.form .form-group input::placeholder {
+  color: #aaa;
+}
+
+/* Input focus */
+.form .form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+/* ===============================
+   Button
+=============================== */
+.form-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.35);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* ===============================
+   Footer Text
+=============================== */
+#auth p {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+#auth p a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+#auth p a:hover {
+  text-decoration: underline;
+}
+
+/* ===============================
+   Error Messages
+=============================== */
+.error-msg {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+/* Error Input */
+.input-error {
+  border-color: #e74c3c !important;
+}
+
+/* Success Input */
+.input-success {
+  border-color: #2ecc71 !important;
+}
+
+/* ===============================
+   Alert Box
+=============================== */
+.alert {
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.alert-success {
+  background: #eafaf1;
+  color: #2ecc71;
+  border: 1px solid #2ecc71;
+}
+
+.alert-error {
+  background: #fdecea;
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+}
+
+/* ======================== */
+/* ===============================
+   AUTH WRAPPER LAYOUT
+=============================== */
+
+.auth-wrapper {
+  width: 62%;
+  max-width: 1000px;
+  background: #fff;
+  border-radius: 14px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Left Form Area */
+#auth {
+  flex: 1;
+  padding: 40px;
+}
+
+.sub-text {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+/* Forgot link */
+.forgot {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.forgot a {
+  font-size: 13px;
+  color: #667eea;
+  text-decoration: none;
+}
+
+/* Right Side Panel */
+.auth-side {
+  flex: 1;
+  background: linear-gradient(135deg, #6029b8, #7b2cbf);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.side-content {
+  text-align: left;
+  padding: 20px 30px;
+}
+
+.side-content h3 {
+  margin-bottom: 20px;
+  font-size: 27px;
+  line-height: 1.4;
+  text-align: left;
+  padding-right: 80px;
+  font-weight: 600;
+  /* transform: translate(100px, 10px); */
+  transform: translateY(-150px);
+}
+
+.login-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.side-content img {
+  max-width: 400px;
+  height: 480px;
+  position: absolute;
+  transform: translateY(-214px);
+}
+
+/* Social buttons */
+.social-login {
+  margin-top: 15px;
+}
+
+.social-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 28px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* ===============================
+   Field Error
+=============================== */
+.field-error {
+    color: red;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* ===============================
+   Password toggle (improved)
+   - reserves space inside input
+   - positions toggle inside input area
+   - matches input bg and border
+=============================== */
+
+/* make password group relative so toggle is absolute inside it */
+.form .form-group.password-group {
+  position: relative;
+}
+
+/* reserve space on the right so text doesn't overlap the toggle */
+.form .form-group.password-group input {
+  padding-right: 52px; /* enough space for toggle + padding */
+}
+
+/* toggle button visual - matches input background and subtle border */
+.password-toggle {
+  position: absolute;
+  right: 10px;              /* distance from right edge of input container */
+  top: 50%;
+  transform: translateY(-05%);
+  background: #e6e6e6;      /* match input background for seamless look */
+  border: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  z-index: 3;               /* ensure toggle sits above input */
+  transition: box-shadow 0.12s ease, transform 0.08s ease;
+}
+
+/* slight hover and active feedback */
+.password-toggle:hover {
+  transform: translateY(-10%) scale(1.02);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.password-toggle:active {
+  transform: translateY(-10%) scale(0.99);
+}
+
+/* icon appearance */
+.password-toggle svg {
+  width: 18px;
+  height: 18px;
+  color: #667eea;
+  opacity: 0.95;
+}
+
+/* focus outline for accessibility */
+.password-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+}
+
+/* On small screens, reduce padding so layout stays compact */
+@media (max-width: 480px) {
+  .form .form-group.password-group input {
+    padding-right: 44px;
+  }
+  .password-toggle {
+    right: 8px;
+    padding: 5px;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-wrapper {
+    flex-direction: column;
+  }
+
+  .auth-side {
+    display: none;
+  }
+}
+
+/* ===============================
+   Responsive
+=============================== */
+/* FIX: Reset #auth constraints when inside .auth-wrapper (Login/Register) */
+.auth-wrapper #auth {
+  max-width: none;
+  /* Reset max-width so flex:1 works */
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* Ensure form body takes full width */
+.form-body {
+  width: 100%;
+}
+
+/* Responsive adjustment */
+@media (max-width: 480px) {
+  #auth {
+    padding: 25px 20px;
+  }
+
+  #auth h2 {
+    font-size: 24px;
+  }
+}
