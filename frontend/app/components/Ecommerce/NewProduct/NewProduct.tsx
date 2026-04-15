@@ -2,12 +2,17 @@
 
 import { useState, Fragment } from "react";
 import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useProducts } from "../../../context/ProductContext";
 import "../../../styles/NewProduct.css";
 
 const steps = ["Product Info", "Media", "Social", "Pricing"];
 
 const NewProduct = () => {
     const [currentStep, setCurrentStep] = useState(0);
+    const [submitting, setSubmitting] = useState(false);
+    const { createProduct } = useProducts();
+    const router = useRouter();
 
     // Step 1: Product Info
     const [name, setName] = useState("");
@@ -15,6 +20,7 @@ const NewProduct = () => {
     const [size, setSize] = useState("Large");
     const [category, setCategory] = useState("Clothing");
     const [description, setDescription] = useState("");
+    const [quantity, setQuantity] = useState("");
 
     // Step 2: Media
     const [dragActive, setDragActive] = useState(false);
@@ -32,7 +38,7 @@ const NewProduct = () => {
     const [price, setPrice] = useState("");
     const [currency, setCurrency] = useState("USD");
     const [sku, setSku] = useState("");
-    const [tags, setTags] = useState("");
+    const [status, setStatus] = useState("In Stock");
 
     const handleNext = () => {
         if (currentStep < steps.length - 1) {
@@ -71,13 +77,33 @@ const NewProduct = () => {
         }
     };
 
-    const handleSubmit = () => {
-        console.log("Product submitted:", {
-            name, weight, size, category, description,
-            uploadedFile,
-            facebookAccount, instagramAccount, linkedinAccount, dribbbleAccount, behanceAccount, ui8Account,
-            price, currency, sku, tags
-        });
+    const handleSubmit = async () => {
+        if (!name.trim()) return;
+        setSubmitting(true);
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("weight", weight);
+        formData.append("size", size);
+        formData.append("category", category);
+        formData.append("description", description);
+        formData.append("facebookAccount", facebookAccount);
+        formData.append("instagramAccount", instagramAccount);
+        formData.append("linkedinAccount", linkedinAccount);
+        formData.append("dribbbleAccount", dribbbleAccount);
+        formData.append("behanceAccount", behanceAccount);
+        formData.append("ui8Account", ui8Account);
+        formData.append("price", price);
+        formData.append("currency", currency);
+        formData.append("sku", sku);
+        formData.append("quantity", quantity);
+        formData.append("status", status);
+        if (uploadedFile) formData.append("image", uploadedFile);
+
+        const res = await createProduct(formData);
+        setSubmitting(false);
+        if (res.success) {
+            router.push("/ecommerce/products/list");
+        }
     };
 
     return (
@@ -153,6 +179,19 @@ const NewProduct = () => {
                                     <option value="Accessories">Accessories</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-field">
+                                <label>Quantity</label>
+                                <input
+                                    type="number"
+                                    placeholder="0"
+                                    value={quantity}
+                                    onChange={(e) => setQuantity(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-field"></div>
                         </div>
 
                         <div className="form-row half">
@@ -308,13 +347,11 @@ const NewProduct = () => {
                                 />
                             </div>
                             <div className="form-field">
-                                <label>Tags</label>
-                                <input
-                                    type="text"
-                                    placeholder="In stock"
-                                    value={tags}
-                                    onChange={(e) => setTags(e.target.value)}
-                                />
+                                <label>Status</label>
+                                <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                                    <option value="In Stock">In Stock</option>
+                                    <option value="Out of Stock">Out of Stock</option>
+                                </select>
                             </div>
                         </div>
                     </>
@@ -332,8 +369,8 @@ const NewProduct = () => {
                             Next
                         </button>
                     ) : (
-                        <button className="btn-next" onClick={handleSubmit}>
-                            Submit
+                        <button className="btn-next" onClick={handleSubmit} disabled={submitting}>
+                            {submitting ? "Submitting..." : "Submit"}
                         </button>
                     )}
                 </div>

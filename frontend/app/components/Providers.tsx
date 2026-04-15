@@ -5,6 +5,7 @@ import { AuthProvider } from "../context/AuthContext";
 import { ToastProvider, useToast } from "../context/ToastContext";
 import { TeamProvider } from "../context/TeamContext";
 import { UserProvider } from "../context/UserContext";
+import { ProductProvider } from "../context/ProductContext";
 import Toast from "./UI/Toast/Toast";
 
 const ToastContainer = () => {
@@ -28,8 +29,10 @@ export const Providers = ({ children }: { children: ReactNode }) => { // ye => {
             <AuthProvider>
                 <UserProvider>
                     <TeamProvider>
-                        <ToastContainer />
-                        {children}    {/* ye {children} => ye React ke props ka ek special prop hai jo ki component ke andar pass kiya gaya content ko represent karta hai. Jab aap Providers component ko use karte hain aur uske andar kuch JSX elements ya components pass karte hain, to wo content {children} ke through Providers component ke andar render hota hai. Iska matlab hai ki Providers component ke andar jo bhi content aap pass karenge wo {children} ke jagah par dikhai dega. */ }
+                        <ProductProvider>
+                            <ToastContainer />
+                            {children}
+                        </ProductProvider>
                     </TeamProvider>
                 </UserProvider>
             </AuthProvider>

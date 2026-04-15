@@ -80,6 +80,43 @@ export interface IUsersContext {
     inviteUser: (email: string, role?: string) => Promise<any>;
 }
 
+export interface IProduct {
+    _id: string;
+    name: string;
+    weight?: string;
+    size?: string;
+    category?: string;
+    description?: string;
+    image?: string;
+    facebookAccount?: string;
+    instagramAccount?: string;
+    linkedinAccount?: string;
+    dribbbleAccount?: string;
+    behanceAccount?: string;
+    ui8Account?: string;
+    price?: number;
+    currency?: string;
+    sku?: string;
+    tags?: string;
+    quantity?: number;
+    status?: string;
+    ownerId: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface IProductContext {
+    products: IProduct[];
+    loading: boolean;
+    error: string | null;
+    fetchProducts: () => Promise<void>;
+    searchProducts: (query: string) => Promise<{ success: boolean; data?: any[] }>;
+    createProduct: (data: FormData) => Promise<any>;
+    updateProduct: (id: string, data: FormData) => Promise<any>;
+    deleteProduct: (id: string) => Promise<any>;
+    getProduct: (id: string) => Promise<any>;
+}
+
 export interface ITeamContext {
     teamMembers: ITeamMember[];
     loading: boolean;

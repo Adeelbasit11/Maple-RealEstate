@@ -19,6 +19,9 @@ const CONFIG = {
     TEAM_ENDPOINTS: {
         BASE: "/api/team",
     },
+    PRODUCTS_ENDPOINTS: {
+        BASE: "/api/products",
+    },
     STRIPE_ENDPOINTS: {
         BASE: "/api/stripe",
         CHECKOUT_SESSION: "/api/stripe/create-checkout-session",

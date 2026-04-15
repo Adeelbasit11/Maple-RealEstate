@@ -1,34 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useProducts } from "../../../context/ProductContext";
 import "../../../styles/EditProduct.css";
 
 const EditProduct = () => {
-    // Product Info (pre-filled)
-    const [name, setName] = useState("Off-White");
-    const [weight, setWeight] = useState("42");
+    const params = useParams();
+    const router = useRouter();
+    const productId = params?.id as string;
+    const { getProduct, updateProduct } = useProducts();
+
+    const [loadingData, setLoadingData] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+
+    // Product Info
+    const [name, setName] = useState("");
+    const [weight, setWeight] = useState("");
     const [size, setSize] = useState("Large");
     const [category, setCategory] = useState("Clothing");
-    const [description, setDescription] = useState("Some initial bold text");
+    const [description, setDescription] = useState("");
+    const [quantity, setQuantity] = useState("");
 
     // Media
     const [dragActive, setDragActive] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [existingImage, setExistingImage] = useState<string | null>(null);
 
-    // Social (pre-filled)
-    const [facebookAccount, setFacebookAccount] = useState("@warner");
-    const [instagramAccount, setInstagramAccount] = useState("@warner");
-    const [linkedinAccount, setLinkedinAccount] = useState("@warner");
-    const [dribbbleAccount, setDribbbleAccount] = useState("@warner");
-    const [behanceAccount, setBehanceAccount] = useState("@warner");
-    const [ui8Account, setUi8Account] = useState("@warner");
+    // Social
+    const [facebookAccount, setFacebookAccount] = useState("");
+    const [instagramAccount, setInstagramAccount] = useState("");
+    const [linkedinAccount, setLinkedinAccount] = useState("");
+    const [dribbbleAccount, setDribbbleAccount] = useState("");
+    const [behanceAccount, setBehanceAccount] = useState("");
+    const [ui8Account, setUi8Account] = useState("");
 
-    // Pricing (pre-filled)
-    const [price, setPrice] = useState("$100");
+    // Pricing
+    const [price, setPrice] = useState("");
     const [currency, setCurrency] = useState("USD");
-    const [sku, setSku] = useState("829672639");
-    const [tags, setTags] = useState("In stock");
+    const [sku, setSku] = useState("");
+    const [status, setStatus] = useState("In Stock");
+
+    useEffect(() => {
+        if (!productId) return;
+        const load = async () => {
+            setLoadingData(true);
+            const res = await getProduct(productId);
+            if (res.success && res.data) {
+                const p = res.data;
+                setName(p.name || "");
+                setWeight(p.weight || "");
+                setSize(p.size || "Large");
+                setCategory(p.category || "Clothing");
+                setDescription(p.description || "");
+                setExistingImage(p.image || null);
+                setFacebookAccount(p.facebookAccount || "");
+                setInstagramAccount(p.instagramAccount || "");
+                setLinkedinAccount(p.linkedinAccount || "");
+                setDribbbleAccount(p.dribbbleAccount || "");
+                setBehanceAccount(p.behanceAccount || "");
+                setUi8Account(p.ui8Account || "");
+                setPrice(p.price != null ? String(p.price) : "");
+                setCurrency(p.currency || "USD");
+                setSku(p.sku || "");
+                setQuantity(p.quantity != null ? String(p.quantity) : "");
+                setStatus(p.status || "In Stock");
+            }
+            setLoadingData(false);
+        };
+        load();
+    }, [productId, getProduct]);
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -55,14 +97,38 @@ const EditProduct = () => {
         }
     };
 
-    const handleSubmit = () => {
-        console.log("Product updated:", {
-            name, weight, size, category, description,
-            uploadedFile,
-            facebookAccount, instagramAccount, linkedinAccount, dribbbleAccount, behanceAccount, ui8Account,
-            price, currency, sku, tags
-        });
+    const handleSubmit = async () => {
+        if (!name.trim()) return;
+        setSubmitting(true);
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("weight", weight);
+        formData.append("size", size);
+        formData.append("category", category);
+        formData.append("description", description);
+        formData.append("facebookAccount", facebookAccount);
+        formData.append("instagramAccount", instagramAccount);
+        formData.append("linkedinAccount", linkedinAccount);
+        formData.append("dribbbleAccount", dribbbleAccount);
+        formData.append("behanceAccount", behanceAccount);
+        formData.append("ui8Account", ui8Account);
+        formData.append("price", price);
+        formData.append("currency", currency);
+        formData.append("sku", sku);
+        formData.append("quantity", quantity);
+        formData.append("status", status);
+        if (uploadedFile) formData.append("image", uploadedFile);
+
+        const res = await updateProduct(productId, formData);
+        setSubmitting(false);
+        if (res.success) {
+            router.push("/ecommerce/products/list");
+        }
     };
+
+    if (loadingData) {
+        return <div className="edit-product-page"><p>Loading...</p></div>;
+    }
 
     return (
         <div className="edit-product-page">
@@ -122,6 +188,19 @@ const EditProduct = () => {
                         </div>
                     </div>
 
+                    <div className="form-row">
+                        <div className="form-field">
+                            <label>Quantity</label>
+                            <input
+                                type="number"
+                                placeholder="0"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)}
+                            />
+                        </div>
+                        <div className="form-field"></div>
+                    </div>
+
                     <div className="form-row half">
                         <div className="form-field">
                             <label>Description</label>
@@ -151,6 +230,14 @@ const EditProduct = () => {
                         </div>
                         {uploadedFile ? (
                             <p className="dropzone-text">{uploadedFile.name}</p>
+                        ) : existingImage ? (
+                            <>
+                                <img src={existingImage} alt="Current" style={{ maxHeight: 80, borderRadius: 8, marginBottom: 8 }} />
+                                <p className="dropzone-text">
+                                    Drop new image or{" "}
+                                    <label htmlFor="file-upload" className="browse-link">Browse</label>
+                                </p>
+                            </>
                         ) : (
                             <>
                                 <p className="dropzone-text">
@@ -269,21 +356,19 @@ const EditProduct = () => {
                             />
                         </div>
                         <div className="form-field">
-                            <label>Tags</label>
-                            <input
-                                type="text"
-                                placeholder="In stock"
-                                value={tags}
-                                onChange={(e) => setTags(e.target.value)}
-                            />
+                            <label>Status</label>
+                            <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                                <option value="In Stock">In Stock</option>
+                                <option value="Out of Stock">Out of Stock</option>
+                            </select>
                         </div>
                     </div>
                 </div>
 
                 {/* Actions */}
                 <div className="form-actions">
-                    <button className="btn-next" onClick={handleSubmit}>
-                        Update
+                    <button className="btn-next" onClick={handleSubmit} disabled={submitting}>
+                        {submitting ? "Updating..." : "Update"}
                     </button>
                 </div>
             </div>

@@ -14,6 +14,7 @@ import connectDB from "./config/database";
 import authRoutes from "./routes/auth";
 import usersRoutes from "./routes/users";
 import teamRoutes from "./routes/team";
+import productRoutes from "./routes/products";
 
 // Database
 connectDB();
@@ -46,6 +47,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/products", productRoutes);
 
 // SERVER
 app.listen(PORT, () => {

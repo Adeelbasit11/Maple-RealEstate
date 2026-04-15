@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import stripe, { PLAN_PRICES } from "../config/stripe";
-import AuthUser from "../models/AuthUser";
+import db from "../db/knex";
 
 // export const createCheckoutSession = async (req: Request, res: Response) => {
 //     try {
@@ -38,8 +38,10 @@ import AuthUser from "../models/AuthUser";
 //                     console.log(`[Stripe] Subscription downgrade: ${user.subscriptionId}, new plan: ${plan}`);
                     
 //                     // Update user's pending plan in database
-//                     user.subscriptionPlan = plan; // Update immediately for UI
-//                     await user.save();
+//                     await db("auth_users").where("id", user.id).update({
+//                         subscription_plan: plan,
+//                         updated_at: new Date(),
+//                     });
                     
 //                     return res.status(200).json({ 
 //                         success: true, 
@@ -61,11 +63,13 @@ import AuthUser from "../models/AuthUser";
 //             console.log(`[Stripe] Creating new Stripe customer for: ${user.email}`);
 //             const customer = await stripe.customers.create({
 //                 email: user.email,
-//                 metadata: { userId: user._id.toString() },
+//                 metadata: { userId: user.id },
 //             });
 //             customerId = customer.id;
-//             user.stripeCustomerId = customerId;
-//             await user.save();
+//             await db("auth_users").where("id", user.id).update({
+//                 stripe_customer_id: customerId,
+//                 updated_at: new Date(),
+//             });
 //             console.log(`[Stripe] New customerId created: ${customerId}`);
 //         }
 
@@ -84,7 +88,7 @@ import AuthUser from "../models/AuthUser";
 //             success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
 //             cancel_url: `${process.env.FRONTEND_URL}/cancel`,
 //             metadata: {
-//                 userId: user._id.toString(),
+//                 userId: user.id,
 //                 plan,
 //                 isUpgrade: isUpgrade ? "true" : "false",
 //             },
@@ -146,8 +150,10 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
                         proration_behavior: "none",
                     });
 
-                    user.subscriptionPlan = plan;
-                    await user.save();
+                    await db("auth_users").where("id", user.id).update({
+                        subscription_plan: plan,
+                        updated_at: new Date(),
+                    });
                     
                     return res.status(200).json({ 
                         success: true, 
@@ -167,11 +173,13 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
         if (!customerId) {
             const customer = await stripe.customers.create({
                 email: user.email,
-                metadata: { userId: user._id.toString() },
+                metadata: { userId: user.id },
             });
             customerId = customer.id;
-            user.stripeCustomerId = customerId;
-            await user.save();
+            await db("auth_users").where("id", user.id).update({
+                stripe_customer_id: customerId,
+                updated_at: new Date(),
+            });
         }
 
         // Get plan price amount from Stripe
@@ -203,7 +211,7 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
             currency: price.currency,
             payment_method_types: ["card"],
             metadata: {
-                userId: user._id.toString(),
+                userId: user.id,
                 plan,
                 isUpgrade: isUpgrade ? "true" : "false",
                 type: "subscription_payment",
@@ -280,7 +288,7 @@ export const confirmPayment = async (req: Request, res: Response) => {
             default_payment_method: paymentMethodId,
             trial_end: trialEnd,
             metadata: {
-                userId: user._id.toString(),
+                userId: user.id,
                 plan,
             },
         };
@@ -294,16 +302,15 @@ export const confirmPayment = async (req: Request, res: Response) => {
         console.log(`[Stripe] Subscription created: ${subscription.id}`);
 
         // Update user in database
-        user.subscriptionId = subscription.id;
-        user.subscriptionPlan = plan;
-        user.subscriptionStatus = subscription.status;
-        
+        const updateFields: Record<string, any> = {
+            subscription_id: subscription.id,
+            subscription_plan: plan,
+            subscription_status: subscription.status,
+            updated_at: new Date(),
+        };
         const endDate = convertUnixToDate(subscription.current_period_end);
-        if (endDate) {
-            user.subscriptionCurrentPeriodEnd = endDate;
-        }
-
-        await user.save();
+        if (endDate) updateFields.subscription_current_period_end = endDate;
+        await db("auth_users").where("id", user.id).update(updateFields);
 
         res.status(200).json({ 
             success: true, 
@@ -504,26 +511,21 @@ export const handleWebhook = async (req: Request, res: Response) => {
                 const subscription: any = await stripe.subscriptions.retrieve(subscriptionId);
                 console.log(`[Stripe Webhook] Subscription retrieved: ${subscription.id}, status: ${subscription.status}`);
 
-                const updateData: any = {
-                    subscriptionId,
-                    subscriptionPlan: plan,
-                    subscriptionStatus: subscription.status,
+                const pgUpdateData: Record<string, any> = {
+                    subscription_id: subscriptionId,
+                    subscription_plan: plan,
+                    subscription_status: subscription.status,
+                    updated_at: new Date(),
                 };
-
                 const endDate = convertUnixToDate(subscription.current_period_end);
                 if (endDate) {
-                    updateData.subscriptionCurrentPeriodEnd = endDate;
+                    pgUpdateData.subscription_current_period_end = endDate;
                 }
-
-                const updatedUser = await AuthUser.findByIdAndUpdate(userId, updateData, { 
-                    new: true,
-                    returnDocument: "after"
-                });
-
-                if (!updatedUser) {
+                const count = await db("auth_users").where("id", userId).update(pgUpdateData);
+                if (!count) {
                     console.log(`[Stripe Webhook] User not found for ID: ${userId}`);
                 } else {
-                    console.log(`[Stripe Webhook] User ${updatedUser.email} updated. New plan: ${updatedUser.subscriptionPlan}, status: ${updatedUser.subscriptionStatus}`);
+                    console.log(`[Stripe Webhook] User ${userId} updated. New plan: ${plan}, status: ${subscription.status}`);
                 }
                 break;
             }
@@ -534,7 +536,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
 
                 console.log(`[Stripe Webhook] subscription.created for customer: ${customerId}, subId: ${subscriptionId}`);
 
-                const user = await AuthUser.findOne({ stripeCustomerId: customerId });
+                const user = await db("auth_users").where("stripe_customer_id", customerId).first();
                 if (user) {
                     // Get plan from subscription items
                     const priceId = subscription.items.data[0]?.price.id;
@@ -548,16 +550,15 @@ export const handleWebhook = async (req: Request, res: Response) => {
                         }
                     }
 
-                    user.subscriptionId = subscriptionId;
-                    user.subscriptionPlan = planName;
-                    user.subscriptionStatus = subscription.status;
-                    
+                    const subUpdate: Record<string, any> = {
+                        subscription_id: subscriptionId,
+                        subscription_plan: planName,
+                        subscription_status: subscription.status,
+                        updated_at: new Date(),
+                    };
                     const endDate = convertUnixToDate(subscription.current_period_end);
-                    if (endDate) {
-                        user.subscriptionCurrentPeriodEnd = endDate;
-                    }
-                    
-                    await user.save();
+                    if (endDate) subUpdate.subscription_current_period_end = endDate;
+                    await db("auth_users").where("id", user.id).update(subUpdate);
                     console.log(`[Stripe Webhook] User ${user.email} subscription created. Plan: ${planName}, status: ${subscription.status}`);
                 } else {
                     console.log(`[Stripe Webhook] User not found for customerId: ${customerId}`);
@@ -570,17 +571,16 @@ export const handleWebhook = async (req: Request, res: Response) => {
 
                 console.log(`[Stripe Webhook] subscription.updated for customer: ${customerId}`);
 
-                const user = await AuthUser.findOne({ stripeCustomerId: customerId });
+                const user = await db("auth_users").where("stripe_customer_id", customerId).first();
                 if (user) {
-                    user.subscriptionStatus = subscription.status;
-                    
+                    const updFields: Record<string, any> = {
+                        subscription_status: subscription.status,
+                        updated_at: new Date(),
+                    };
                     const endDate = convertUnixToDate(subscription.current_period_end);
-                    if (endDate) {
-                        user.subscriptionCurrentPeriodEnd = endDate;
-                    }
-                    
-                    await user.save();
-                    console.log(`[Stripe Webhook] User ${user.email} subscription updated to status: ${user.subscriptionStatus}`);
+                    if (endDate) updFields.subscription_current_period_end = endDate;
+                    await db("auth_users").where("id", user.id).update(updFields);
+                    console.log(`[Stripe Webhook] User ${user.email} subscription updated to status: ${subscription.status}`);
                 } else {
                     console.log(`[Stripe Webhook] User not found for customerId: ${customerId}`);
                 }
@@ -592,12 +592,14 @@ export const handleWebhook = async (req: Request, res: Response) => {
 
                 console.log(`[Stripe Webhook] subscription.deleted for customer: ${customerId}`);
 
-                const user = await AuthUser.findOne({ stripeCustomerId: customerId });
+                const user = await db("auth_users").where("stripe_customer_id", customerId).first();
                 if (user) {
-                    user.subscriptionPlan = "Free";
-                    user.subscriptionStatus = "canceled";
-                    user.subscriptionId = undefined;
-                    await user.save();
+                    await db("auth_users").where("id", user.id).update({
+                        subscription_plan: "Free",
+                        subscription_status: "canceled",
+                        subscription_id: null,
+                        updated_at: new Date(),
+                    });
                     console.log(`[Stripe Webhook] User ${user.email} subscription deleted. Reset to Free plan`);
                 } else {
                     console.log(`[Stripe Webhook] User not found for customerId: ${customerId}`);
@@ -619,7 +621,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
 
 export const getSubscriptionStatus = async (req: Request, res: Response) => {
     try {
-        const user = await AuthUser.findById(req.user._id);
+        const user = await db("auth_users").where("id", req.user.id).first();
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }

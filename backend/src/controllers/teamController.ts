@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import TeamMember from "../models/TeamMember";
+import db from "../db/knex";
 
 // helper
 const buildImageUrl = (req: Request, filePath?: string): string | null => {
@@ -14,38 +14,31 @@ const buildImageUrl = (req: Request, filePath?: string): string | null => {
 export const getAllTeamMembers = async (req: Request, res: Response): Promise<void> => {
     try {
         const { q } = req.query;
-        const baseFilter = {
-            isDeleted: { $ne: true },
-        };
 
-        // If search query exists, add search criteria
-        let filter: any = baseFilter;
+        let query = db("team_members")
+            .where("is_deleted", false)
+            .orderBy("created_at", "desc");
+
         if (q && (q as string).trim()) {
-            const regex = new RegExp((q as string).trim(), "i");
-            filter = {
-                ...baseFilter,
-                $or: [
-                    { name: regex },
-                    { email: regex },
-                    { username: regex },
-                ],
-            };
+            const search = `%${(q as string).trim()}%`;
+            query = query.where(function (this: any) {
+                this.whereILike("name", search)
+                    .orWhereILike("email", search)
+                    .orWhereILike("username", search);
+            });
         }
 
-        const members = await TeamMember.find(filter).sort({
-            createdAt: -1,
-        });
+        const members = await query;
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: q 
+            message: q
                 ? `Found ${members.length} team member(s) matching "${(q as string).trim()}"`
                 : "Team members fetch successfully",
-            data: members.map((m) => {
-                const obj = m.toObject();
-                (obj as any).profileImage = buildImageUrl(req, obj.profileImage);
-                return obj;
+            data: members.map((m: any) => {
+                m.profileImage = buildImageUrl(req, m.profileImage);
+                return m;
             }),
         });
     } catch (error) {
@@ -67,7 +60,7 @@ export const createTeamMember = async (req: Request, res: Response): Promise<voi
             zipCode, bio, timezone, role,
         } = req.body;
 
-        const memberExists = await TeamMember.findOne({ email });
+        const memberExists = await db("team_members").where({ email }).first();
         if (memberExists) {
             if (!memberExists.isDeleted) {
                 res.status(400).json({
@@ -78,7 +71,7 @@ export const createTeamMember = async (req: Request, res: Response): Promise<voi
                 });
                 return;
             } else {
-                await TeamMember.findByIdAndDelete(memberExists._id);
+                await db("team_members").where("id", memberExists.id).delete();
             }
         }
 
@@ -91,33 +84,29 @@ export const createTeamMember = async (req: Request, res: Response): Promise<voi
             return;
         }
 
-        const member = new TeamMember({
+        const [member] = await db("team_members").insert({
             name,
             email,
             phone,
             username,
             city,
             country,
-            zipCode,
+            zip_code: zipCode,
             bio,
             timezone,
             role: role || "Viewer",
-            isVerified: true,
-        });
-
-        await member.save();
-
-        const obj = member.toObject();
+            is_verified: true,
+        }).returning("*");
 
         res.status(201).json({
             status: 201,
             success: true,
             message: "Team member created successfully",
-            data: obj,
+            data: member,
         });
     } catch (error: any) {
         console.error("Create Team Member Error:", error);
-        if (error.code === 11000) {
+        if (error.code === "23505") {
             res.status(400).json({
                 status: 400,
                 success: false,
@@ -145,7 +134,7 @@ export const updateTeamMember = async (req: Request, res: Response): Promise<voi
             zipCode, bio, timezone, role,
         } = req.body;
 
-        const member = await TeamMember.findOne({ _id: id, isDeleted: { $ne: true } });
+        const member = await db("team_members").where({ id, is_deleted: false }).first();
         if (!member) {
             res.status(404).json({
                 status: 404,
@@ -155,29 +144,28 @@ export const updateTeamMember = async (req: Request, res: Response): Promise<voi
             return;
         }
 
-        if (name !== undefined) member.name = name;
-        if (email !== undefined) member.email = email;
-        if (phone !== undefined) member.phone = phone;
-        if (username !== undefined) member.username = username;
-        if (city !== undefined) member.city = city;
-        if (country !== undefined) member.country = country;
-        if (zipCode !== undefined) member.zipCode = zipCode;
-        if (bio !== undefined) member.bio = bio;
-        if (timezone !== undefined) member.timezone = timezone;
-        if (role !== undefined) member.role = role;
+        const updates: Record<string, any> = { updated_at: new Date() };
+        if (name !== undefined) updates.name = name;
+        if (email !== undefined) updates.email = email;
+        if (phone !== undefined) updates.phone = phone;
+        if (username !== undefined) updates.username = username;
+        if (city !== undefined) updates.city = city;
+        if (country !== undefined) updates.country = country;
+        if (zipCode !== undefined) updates.zip_code = zipCode;
+        if (bio !== undefined) updates.bio = bio;
+        if (timezone !== undefined) updates.timezone = timezone;
+        if (role !== undefined) updates.role = role;
 
-        await member.save();
-
-        const obj = member.toObject();
+        const [updated] = await db("team_members").where("id", id).update(updates).returning("*");
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Team member updated successfully",
-            data: obj,
+            data: updated,
         });
     } catch (error: any) {
-        if (error.code === 11000) {
+        if (error.code === "23505") {
             res.status(400).json({
                 status: 400,
                 success: false,
@@ -201,13 +189,11 @@ export const deleteTeamMember = async (req: Request, res: Response): Promise<voi
     try {
         const { id } = req.params;
 
-        const member = await TeamMember.findOneAndUpdate(
-            { _id: id, isDeleted: { $ne: true } },
-            { isDeleted: true, deletedAt: new Date() },
-            { new: true }
-        );
+        const count = await db("team_members")
+            .where({ id, is_deleted: false })
+            .update({ is_deleted: true, deleted_at: new Date(), updated_at: new Date() });
 
-        if (!member) {
+        if (!count) {
             res.status(404).json({
                 status: 404,
                 success: false,

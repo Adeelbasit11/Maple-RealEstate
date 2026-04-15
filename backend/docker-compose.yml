@@ -1,30 +1,30 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:4.4
-    container_name: mongo
+  postgres:
+    image: postgres:16
+    container_name: postgres
     restart: always
     ports:
-      - "27017:27017"
+      - "5432:5432"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: adeel
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adeel
+      POSTGRES_DB: first_website
     volumes:
-      - mongo_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
 
-  mongo-express:
-    image: mongo-express
-    container_name: mongo-express
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
     restart: always
     ports:
-      - "8081:8081"
+      - "8081:80"
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://admin:adeel@mongo:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: adeel
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: adeel
     depends_on:
-      - mongo
+      - postgres
 
   backend:
     build: .
@@ -35,12 +35,16 @@ services:
     env_file:
       - .env
     environment:
-      MONGO_URI: mongodb://admin:adeel@mongo:27017/first-website?authSource=admin
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DATABASE: first_website
+      PG_USER: admin
+      PG_PASSWORD: adeel
       PORT: 5000
     depends_on:
-      - mongo
+      - postgres
     volumes:
       - ./uploads:/app/uploads
 
 volumes:
-  mongo_data:
+  postgres_data:

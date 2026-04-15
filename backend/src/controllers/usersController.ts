@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import AuthUser from "../models/AuthUser";
-import Invitation from "../models/Invitation";
+import db from "../db/knex";
 import transporter from "../config/mailer";
 import { getInvitationEmailTemplate } from "../services/emailTemplates";
 
@@ -19,39 +18,35 @@ const buildImageUrl = (req: Request, filePath?: string): string | null => {
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
     try {
         const { q } = req.query;
-        const baseFilter = {
-            ownerId: req.user.id,
-            isDeleted: { $ne: true },
-        };
 
-        // If search query exists, add search criteria
-        let filter: any = baseFilter;
+        let query = db("auth_users")
+            .where("owner_id", req.user.id)
+            .where("is_deleted", false)
+            .orderBy("created_at", "desc");
+
         if (q && (q as string).trim()) {
-            const regex = new RegExp((q as string).trim(), "i");
-            filter = {
-                ...baseFilter,
-                $or: [
-                    { name: regex },
-                    { email: regex },
-                    { username: regex },
-                ],
-            };
+            const search = `%${(q as string).trim()}%`;
+            query = query.where(function (this: any) {
+                this.whereILike("name", search)
+                    .orWhereILike("email", search)
+                    .orWhereILike("username", search);
+            });
         }
 
-        const users = await AuthUser.find(filter)
-            .select("-password -resetPasswordToken -resetPasswordExpire")
-            .sort({ createdAt: -1 });
+        const users = await query;
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: q 
-                ? `Found ${users.length} user(s) matching "${(q as string).trim()}"` 
+            message: q
+                ? `Found ${users.length} user(s) matching "${(q as string).trim()}"`
                 : "Users fetch successfully",
-            data: users.map((u) => {
-                const obj = u.toObject();
-                (obj as any).profileImage = buildImageUrl(req, obj.profileImage);
-                return obj;
+            data: users.map((u: any) => {
+                delete u.password;
+                delete u.resetPasswordToken;
+                delete u.resetPasswordExpire;
+                u.profileImage = buildImageUrl(req, u.profileImage);
+                return u;
             }),
         });
     } catch (error) {
@@ -73,7 +68,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
             zipCode, bio, timezone, password, role,
         } = req.body;
 
-        const userExists = await AuthUser.findOne({ email });
+        const userExists = await db("auth_users").where({ email }).first();
         if (userExists) {
             if (!userExists.isDeleted) {
                 res.status(400).json({
@@ -84,7 +79,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
                 });
                 return;
             } else {
-                await AuthUser.findByIdAndDelete(userExists._id);
+                await db("auth_users").where("id", userExists.id).delete();
             }
         }
 
@@ -99,37 +94,34 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = new AuthUser({
+        const [user] = await db("auth_users").insert({
             name,
             email,
             phone,
             username,
             city,
             country,
-            zipCode,
+            zip_code: zipCode,
             bio,
             timezone,
             password: hashedPassword,
             role: role || "Viewer",
-            isVerified: true,
-            ownerId: req.user.id,
-        });
+            is_verified: true,
+            owner_id: req.user.id,
+        }).returning("*");
 
-        await user.save();
-
-        const obj: any = user.toObject();
-        delete obj.password;
-        delete obj.resetPasswordToken;
-        delete obj.resetPasswordExpire;
+        delete user.password;
+        delete user.resetPasswordToken;
+        delete user.resetPasswordExpire;
 
         res.status(201).json({
             status: 201,
             success: true,
             message: "User created successfully",
-            data: obj,
+            data: user,
         });
     } catch (error: any) {
-        if (error.code === 11000) {
+        if (error.code === "23505") {
             res.status(400).json({
                 status: 400,
                 success: false,
@@ -157,7 +149,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
             zipCode, bio, timezone, role,
         } = req.body;
 
-        const user = await AuthUser.findOne({ _id: id, ownerId: req.user.id });
+        const user = await db("auth_users").where({ id, owner_id: req.user.id }).first();
         if (!user) {
             res.status(404).json({
                 status: 404,
@@ -167,32 +159,32 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
-        if (name !== undefined) user.name = name;
-        if (email !== undefined) user.email = email;
-        if (phone !== undefined) user.phone = phone;
-        if (username !== undefined) user.username = username;
-        if (city !== undefined) user.city = city;
-        if (country !== undefined) user.country = country;
-        if (zipCode !== undefined) user.zipCode = zipCode;
-        if (bio !== undefined) user.bio = bio;
-        if (timezone !== undefined) user.timezone = timezone;
-        if (role !== undefined) user.role = role;
+        const updates: Record<string, any> = { updated_at: new Date() };
+        if (name !== undefined) updates.name = name;
+        if (email !== undefined) updates.email = email;
+        if (phone !== undefined) updates.phone = phone;
+        if (username !== undefined) updates.username = username;
+        if (city !== undefined) updates.city = city;
+        if (country !== undefined) updates.country = country;
+        if (zipCode !== undefined) updates.zip_code = zipCode;
+        if (bio !== undefined) updates.bio = bio;
+        if (timezone !== undefined) updates.timezone = timezone;
+        if (role !== undefined) updates.role = role;
 
-        await user.save();
+        const [updated] = await db("auth_users").where("id", id).update(updates).returning("*");
 
-        const obj: any = user.toObject();
-        delete obj.password;
-        delete obj.resetPasswordToken;
-        delete obj.resetPasswordExpire;
+        delete updated.password;
+        delete updated.resetPasswordToken;
+        delete updated.resetPasswordExpire;
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "User updated successfully",
-            data: obj,
+            data: updated,
         });
     } catch (error: any) {
-        if (error.code === 11000) {
+        if (error.code === "23505") {
             res.status(400).json({
                 status: 400,
                 success: false,
@@ -216,13 +208,11 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     try {
         const { id } = req.params;
 
-        const user = await AuthUser.findOneAndUpdate(
-            { _id: id, ownerId: req.user.id, isDeleted: { $ne: true } },
-            { isDeleted: true, deletedAt: new Date() },
-            { new: true }
-        );
+        const count = await db("auth_users")
+            .where({ id, owner_id: req.user.id, is_deleted: false })
+            .update({ is_deleted: true, deleted_at: new Date(), updated_at: new Date() });
 
-        if (!user) {
+        if (!count) {
             res.status(404).json({
                 status: 404,
                 success: false,
@@ -261,27 +251,25 @@ export const inviteUser = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
-        const userExists = await AuthUser.findOne({ email });
-        if (userExists) {
-            if (!userExists.isDeleted) {
-                res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: "A user with this email already exists",
-                });
-                return;
-            }
+        const userExists = await db("auth_users").where({ email }).first();
+        if (userExists && !userExists.isDeleted) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "A user with this email already exists",
+            });
+            return;
         }
 
         const token = crypto.randomBytes(32).toString("hex");
 
-        const invitation = new Invitation({
+        await db("invitations").insert({
             email,
             token,
             role: role || "Viewer",
-            ownerId: req.user.id,
+            owner_id: req.user.id,
+            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
         });
-        await invitation.save();
 
         const inviteLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/register-invite/${token}`;
 

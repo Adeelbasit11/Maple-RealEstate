@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import AuthUser from "../models/AuthUser";
-import Invitation from "../models/Invitation";
+import db from "../db/knex";
 import transporter from "../config/mailer";
 import { JWT_SECRET } from "../middleware/auth";
 import {
@@ -25,7 +24,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     try {
         const { name, email, phone, password } = req.body;
 
-        const userExists = await AuthUser.findOne({ email });
+        const userExists = await db("auth_users").where({ email }).first();
         if (userExists) {
             if (!userExists.isDeleted) {
                 res.status(400).json({
@@ -36,23 +35,18 @@ export const register = async (req: Request, res: Response): Promise<void> => {
                 });
                 return;
             } else {
-                await AuthUser.findByIdAndDelete(userExists._id);
+                await db("auth_users").where("id", userExists.id).delete();
             }
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = new AuthUser({
-            name,
-            email,
-            phone,
-            password: hashedPassword,
-        });
-
-        await user.save();
+        const [user] = await db("auth_users")
+            .insert({ name, email, phone, password: hashedPassword })
+            .returning("*");
 
         const verifyToken = jwt.sign(
-            { id: user._id.toString(), role: user.role },
+            { id: user.id, role: user.role },
             JWT_SECRET,
             { expiresIn: (process.env.VERIFY_TOKEN_EXPIRY || "1h") as any }
         );
@@ -72,7 +66,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             message: "Registered successfully. Please verify your email.",
         });
     } catch (error: any) {
-        if (error.code === 11000) {
+        if (error.code === "23505") {
             res.status(400).json({
                 status: 400,
                 success: false,
@@ -97,7 +91,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     try {
         const { email, password } = req.body;
 
-        const user = await AuthUser.findOne({ email, isDeleted: { $ne: true } });
+        const user = await db("auth_users").where({ email }).where("is_deleted", false).first();
         if (!user) {
             res.status(400).json({
                 status: 400,
@@ -126,7 +120,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const token = jwt.sign({ id: user._id.toString(), role: user.role }, JWT_SECRET, {
+        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
             expiresIn: "24h",
         });
 
@@ -142,7 +136,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             success: true,
             message: "Login successful",
             data: {
-                _id: user._id,
+                _id: user.id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
@@ -167,24 +161,25 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 // ===============================
 export const checkLoginStatus = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user = await AuthUser.findOne({
-            _id: req.user.id,
-            isDeleted: { $ne: true },
-        }).select("-password -resetPasswordToken -resetPasswordExpire");
+        const user = await db("auth_users")
+            .where("id", req.user.id)
+            .where("is_deleted", false)
+            .first();
 
         if (!user) {
             res.status(401).json({ message: "User not found" });
             return;
         }
 
-        const userObj = user.toObject ? user.toObject() : user;
-        (userObj as any).profileImage = buildImageUrl(req, (userObj as any).profileImage);
-        
-        // Ensure subscription fields have default values if not set (for old users who don't have these fields in DB)
-        (userObj as any).subscriptionPlan = (userObj as any).subscriptionPlan || "Free";
-        (userObj as any).subscriptionStatus = (userObj as any).subscriptionStatus || "unpaid";
-        
-        res.json(userObj);
+        delete user.password;
+        delete user.resetPasswordToken;
+        delete user.resetPasswordExpire;
+
+        user.profileImage = buildImageUrl(req, user.profileImage);
+        user.subscriptionPlan = user.subscriptionPlan || "Free";
+        user.subscriptionStatus = user.subscriptionStatus || "unpaid";
+
+        res.json(user);
     } catch (error) {
         res.status(500).json({
             status: 500,
@@ -201,7 +196,7 @@ export const verifyEmail = async (req: Request, res: Response): Promise<void> =>
     try {
         const decoded = jwt.verify(req.params.token as string, JWT_SECRET) as any;
 
-        const user = await AuthUser.findOne({ _id: decoded.id, isDeleted: { $ne: true } });
+        const user = await db("auth_users").where("id", decoded.id).where("is_deleted", false).first();
 
         if (!user) {
             res.redirect(
@@ -210,8 +205,7 @@ export const verifyEmail = async (req: Request, res: Response): Promise<void> =>
             return;
         }
 
-        user.isVerified = true;
-        await user.save();
+        await db("auth_users").where("id", user.id).update({ is_verified: true, updated_at: new Date() });
 
         res.redirect(
             `${process.env.FRONTEND_URL || "http://localhost:3000"}/login?verified=true`
@@ -230,7 +224,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     try {
         const { email } = req.body;
 
-        const user = await AuthUser.findOne({ email, isDeleted: { $ne: true } });
+        const user = await db("auth_users").where({ email }).where("is_deleted", false).first();
 
         if (!user) {
             res.status(404).json({
@@ -243,10 +237,11 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
 
         const resetToken = crypto.randomBytes(32).toString("hex");
 
-        user.resetPasswordToken = resetToken;
-        user.resetPasswordExpire = new Date(Date.now() + 3600000);
-
-        await user.save();
+        await db("auth_users").where("id", user.id).update({
+            reset_password_token: resetToken,
+            reset_password_expire: new Date(Date.now() + 3600000),
+            updated_at: new Date(),
+        });
 
         const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password/${resetToken}`;
 
@@ -279,11 +274,11 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
         const { token } = req.params;
         const { password } = req.body;
 
-        const user = await AuthUser.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpire: { $gt: Date.now() },
-            isDeleted: { $ne: true },
-        });
+        const user = await db("auth_users")
+            .where("reset_password_token", token)
+            .where("reset_password_expire", ">", new Date())
+            .where("is_deleted", false)
+            .first();
 
         if (!user) {
             res.status(400).json({
@@ -294,11 +289,13 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
-        user.password = await bcrypt.hash(password, 10);
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpire = undefined;
-
-        await user.save();
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await db("auth_users").where("id", user.id).update({
+            password: hashedPassword,
+            reset_password_token: null,
+            reset_password_expire: null,
+            updated_at: new Date(),
+        });
 
         res.json({
             status: 200,
@@ -321,11 +318,11 @@ export const validateResetToken = async (req: Request, res: Response): Promise<v
     try {
         const { token } = req.params;
 
-        const user = await AuthUser.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpire: { $gt: Date.now() },
-            isDeleted: { $ne: true },
-        });
+        const user = await db("auth_users")
+            .where("reset_password_token", token)
+            .where("reset_password_expire", ">", new Date())
+            .where("is_deleted", false)
+            .first();
 
         if (!user) {
             res.status(400).json({
@@ -358,7 +355,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
         const { name, username, phone, city, country, zipCode, bio, timezone } = req.body;
         const userId = req.user.id;
 
-        const user = await AuthUser.findOne({ _id: userId, isDeleted: { $ne: true } });
+        const user = await db("auth_users").where("id", userId).where("is_deleted", false).first();
 
         if (!user) {
             res.status(404).json({
@@ -369,36 +366,34 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
-        if (name) user.name = name;
-        if (username) user.username = username;
-        if (phone) user.phone = phone;
-        if (city) user.city = city;
-        if (country) user.country = country;
-        if (zipCode) user.zipCode = zipCode;
-        if (bio) user.bio = bio;
-        if (timezone) user.timezone = timezone;
+        const updates: Record<string, any> = { updated_at: new Date() };
+        if (name) updates.name = name;
+        if (username) updates.username = username;
+        if (phone) updates.phone = phone;
+        if (city) updates.city = city;
+        if (country) updates.country = country;
+        if (zipCode) updates.zip_code = zipCode;
+        if (bio) updates.bio = bio;
+        if (timezone) updates.timezone = timezone;
+        if (req.file) updates.profile_image = `uploads/${req.file.filename}`;
 
-        if (req.file) {
-            user.profileImage = `uploads/${req.file.filename}`;
-        }
-
-        await user.save();
+        const [updated] = await db("auth_users").where("id", userId).update(updates).returning("*");
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Profile updated successfully",
             data: {
-                name: user.name,
-                email: user.email,
-                username: user.username,
-                phone: user.phone,
-                city: user.city,
-                country: user.country,
-                zipCode: user.zipCode,
-                bio: user.bio,
-                timezone: user.timezone,
-                profileImage: buildImageUrl(req, user.profileImage),
+                name: updated.name,
+                email: updated.email,
+                username: updated.username,
+                phone: updated.phone,
+                city: updated.city,
+                country: updated.country,
+                zipCode: updated.zipCode,
+                bio: updated.bio,
+                timezone: updated.timezone,
+                profileImage: buildImageUrl(req, updated.profileImage),
             },
         });
     } catch (error) {
@@ -434,11 +429,11 @@ export const verifyInvite = async (req: Request, res: Response): Promise<void> =
     try {
         const { token } = req.params;
 
-        const invitation = await Invitation.findOne({
-            token,
-            isUsed: false,
-            expiresAt: { $gt: Date.now() },
-        });
+        const invitation = await db("invitations")
+            .where({ token })
+            .where("is_used", false)
+            .where("expires_at", ">", new Date())
+            .first();
 
         if (!invitation) {
             res.status(400).json({
@@ -451,7 +446,7 @@ export const verifyInvite = async (req: Request, res: Response): Promise<void> =
 
         if (invitation.isAccessed) {
             const gracePeriod = 30 * 1000;
-            const timeSinceAccess = Date.now() - invitation.updatedAt.getTime();
+            const timeSinceAccess = Date.now() - new Date(invitation.updatedAt).getTime();
 
             if (timeSinceAccess > gracePeriod) {
                 res.status(400).json({
@@ -463,8 +458,7 @@ export const verifyInvite = async (req: Request, res: Response): Promise<void> =
             }
         }
 
-        invitation.isAccessed = true;
-        await invitation.save();
+        await db("invitations").where("id", invitation.id).update({ is_accessed: true, updated_at: new Date() });
 
         res.status(200).json({
             status: 200,
@@ -487,11 +481,11 @@ export const registerInvited = async (req: Request, res: Response): Promise<void
     try {
         const { name, password, phone, token } = req.body;
 
-        const invitation = await Invitation.findOne({
-            token,
-            isUsed: false,
-            expiresAt: { $gt: Date.now() },
-        });
+        const invitation = await db("invitations")
+            .where({ token })
+            .where("is_used", false)
+            .where("expires_at", ">", new Date())
+            .first();
 
         if (!invitation) {
             res.status(400).json({
@@ -504,22 +498,19 @@ export const registerInvited = async (req: Request, res: Response): Promise<void
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await AuthUser.findOneAndDelete({ email: invitation.email, isDeleted: true });
+        await db("auth_users").where({ email: invitation.email, is_deleted: true }).delete();
 
-        const newUser = new AuthUser({
+        await db("auth_users").insert({
             name,
             email: invitation.email,
             phone,
             password: hashedPassword,
             role: invitation.role,
-            ownerId: invitation.ownerId,
-            isVerified: true,
+            owner_id: invitation.ownerId,
+            is_verified: true,
         });
 
-        await newUser.save();
-
-        invitation.isUsed = true;
-        await invitation.save();
+        await db("invitations").where("id", invitation.id).update({ is_used: true, updated_at: new Date() });
 
         res.status(201).json({
             status: 201,

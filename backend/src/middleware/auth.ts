@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import AuthUser from "../models/AuthUser";
+import db from "../db/knex";
 
 export const JWT_SECRET: string = process.env.JWT_SECRET as string;
 
@@ -32,7 +32,10 @@ export const authenticate = async (
     try {
         const verified = jwt.verify(token, JWT_SECRET) as { id: string; role: string };
 
-        const user = await AuthUser.findById(verified.id).select("-password");
+        const user = await db("auth_users")
+            .where("id", verified.id)
+            .where("is_deleted", false)
+            .first();
 
         if (!user) {
             res.status(401).json({
@@ -43,6 +46,7 @@ export const authenticate = async (
             return;
         }
 
+        delete user.password;
         req.user = user;
         next();
     } catch (error) {
