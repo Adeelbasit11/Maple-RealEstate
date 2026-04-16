@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { Search, Info, Camera } from "lucide-react";
 import "../../../styles/OrderDetail.css";
 
@@ -13,6 +14,48 @@ const steps = [
 
 const OrderDetail = () => {
     const [rating, setRating] = useState(3);
+    const [order, setOrder] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const params = useParams();
+    const orderId = params.id;
+
+    useEffect(() => {
+        if (!orderId) {
+            setError("Order ID is missing.");
+            setLoading(false);
+            return;
+        }
+
+        const fetchOrder = async () => {
+            try {
+                const response = await fetch(`/api/orders/${orderId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setOrder(data);
+            } catch (err: any) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrder();
+    }, [orderId]);
+
+    if (loading) {
+        return <div className="order-detail-page">Loading order details...</div>;
+    }
+
+    if (error) {
+        return <div className="order-detail-page">Error: {error}</div>;
+    }
+
+    if (!order) {
+        return <div className="order-detail-page">Order not found.</div>;
+    }
 
     return (
         <div className="order-detail-page">
@@ -47,15 +90,15 @@ const OrderDetail = () => {
                         <div className="order-info-rows">
                             <div className="info-row">
                                 <span className="info-label">Order no:</span>
-                                <span className="info-value">EL-5414587</span>
+                                <span className="info-value">{order.orderNumber}</span>
                             </div>
                             <div className="info-row">
                                 <span className="info-label">From:</span>
-                                <span className="info-value">25 Dec, 2022</span>
+                                <span className="info-value">{new Date(order.orderDate).toLocaleDateString()}</span>
                             </div>
                             <div className="info-row">
                                 <span className="info-label">Code:</span>
-                                <span className="info-value">EL005</span>
+                                <span className="info-value">{order.orderCode}</span>
                             </div>
                         </div>
                     </div>
@@ -72,13 +115,17 @@ const OrderDetail = () => {
                         <div className="detail-card">
                             <div className="product-detail-content">
                                 <div className="product-avatar">
-                                    <Camera size={22} color="#fff" />
+                                    {order.productImage ? (
+                                        <img src={order.productImage} alt={order.productName} />
+                                    ) : (
+                                        <Camera size={22} color="#fff" />
+                                    )}
                                 </div>
                                 <div className="product-detail-info">
-                                    <span className="product-detail-name">Camera</span>
-                                    <span className="product-detail-price">$200</span>
-                                    <span className="product-detail-delivery">Order was delivered 2 days ago</span>
-                                    <span className="product-detail-status">Delivered</span>
+                                    <span className="product-detail-name">{order.productName}</span>
+                                    <span className="product-detail-price">${Number(order.productPrice).toFixed(2)}</span>
+                                    <span className="product-detail-delivery">{order.deliveryStatus}</span>
+                                    <span className="product-detail-status">{order.status}</span>
                                 </div>
                             </div>
                             <Info size={16} className="info-icon" />
@@ -90,19 +137,19 @@ const OrderDetail = () => {
                         <h4>Billing Information</h4>
                         <div className="detail-card">
                             <div className="billing-info-content">
-                                <span className="billing-name">Oliver Liam</span>
+                                <span className="billing-name">{order.billingName}</span>
                                 <div className="billing-rows">
                                     <div className="billing-row">
                                         <span className="billing-label">Company Name :</span>
-                                        <span className="billing-value">Viking Burrito</span>
+                                        <span className="billing-value">{order.billingCompany}</span>
                                     </div>
                                     <div className="billing-row">
                                         <span className="billing-label">Email Address :</span>
-                                        <span className="billing-value">Oliver.viking@burrito.com</span>
+                                        <span className="billing-value">{order.billingEmail}</span>
                                     </div>
                                     <div className="billing-row">
                                         <span className="billing-label">VAT number :</span>
-                                        <span className="billing-value">FRB1235476</span>
+                                        <span className="billing-value">{order.vatNumber}</span>
                                     </div>
                                 </div>
                             </div>
@@ -119,13 +166,13 @@ const OrderDetail = () => {
                         <div className="detail-card payment-card">
                             <div className="payment-content">
                                 <div className="payment-top">
-                                    <span className="payment-type">Master Card</span>
+                                    <span className="payment-type">{order.paymentType}</span>
                                     <Info size={16} className="info-icon-inline" />
                                 </div>
-                                <span className="payment-number">Master 1234 **** 58745</span>
-                                <span className="payment-expiry">Expire 12/23</span>
+                                <span className="payment-number">Master **** {order.cardNumberLastDigits}</span>
+                                <span className="payment-expiry">Expire {order.cardExpiry}</span>
                                 <div className="payment-bottom">
-                                    <span className="payment-holder">Aiden Max</span>
+                                    <span className="payment-holder">{order.cardHolderName}</span>
                                     <img src="/mastercard.png" alt="mastercard" className="mastercard-logo" />
                                 </div>
                             </div>
@@ -139,19 +186,19 @@ const OrderDetail = () => {
                             <div className="summary-content">
                                 <div className="summary-row">
                                     <span className="summary-label">Product Price :</span>
-                                    <span className="summary-value">$200</span>
+                                    <span className="summary-value">${Number(order.productPrice).toFixed(2)}</span>
                                 </div>
                                 <div className="summary-row">
                                     <span className="summary-label">Delivery :</span>
-                                    <span className="summary-value">$10</span>
+                                    <span className="summary-value">${Number(order.deliveryCost).toFixed(2)}</span>
                                 </div>
                                 <div className="summary-row">
                                     <span className="summary-label">Taxes :</span>
-                                    <span className="summary-value">$20</span>
+                                    <span className="summary-value">${Number(order.taxes).toFixed(2)}</span>
                                 </div>
                                 <div className="summary-row total">
                                     <span className="summary-label">Total :</span>
-                                    <span className="summary-value">$230</span>
+                                    <span className="summary-value">${Number(order.totalAmount).toFixed(2)}</span>
                                 </div>
                             </div>
                             <div className="review-content">

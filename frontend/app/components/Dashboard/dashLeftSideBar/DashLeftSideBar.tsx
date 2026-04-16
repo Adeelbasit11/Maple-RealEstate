@@ -41,10 +41,10 @@ const DashLeftSideBar = () => {
 
         if (homePaths.includes(pathname)) {
             setOpenMenu("home");
-        } else if (ecommercePaths.includes(pathname)) {
+        } else if (ecommercePaths.some(p => pathname.startsWith(p))) {
             setOpenMenu("ecommerce");
-            if (productPaths.includes(pathname)) setOpenSubMenu("products");
-            else if (orderPaths.includes(pathname)) setOpenSubMenu("orders");
+            if (productPaths.some(p => pathname.startsWith(p))) setOpenSubMenu("products");
+            else if (orderPaths.some(p => pathname.startsWith(p))) setOpenSubMenu("orders");
         }
     }, [pathname]);
 
@@ -185,7 +185,7 @@ const DashLeftSideBar = () => {
                                             <Link href="/ecommerce/orders/list" className={`nested-link ${pathname === "/ecommerce/orders/list" ? "active" : ""}`}>
                                                 Order list
                                             </Link>
-                                            <Link href="/ecommerce/orders/detail" className={`nested-link ${pathname === "/ecommerce/orders/detail" ? "active" : ""}`}>
+                                            <Link href="/ecommerce/orders/detail" className={`nested-link ${pathname?.startsWith("/ecommerce/orders/detail") ? "active" : ""}`}>
                                                 Order Detail
                                             </Link>
                                         </div>

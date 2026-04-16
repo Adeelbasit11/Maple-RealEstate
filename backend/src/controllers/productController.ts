@@ -188,15 +188,35 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
         if (dribbbleAccount !== undefined) updates.dribbble_account = dribbbleAccount;
         if (behanceAccount !== undefined) updates.behance_account = behanceAccount;
         if (ui8Account !== undefined) updates.ui8_account = ui8Account;
-        if (price !== undefined) updates.price = parseFloat(price);
+        if (price !== undefined) {
+            const parsedPrice = parseFloat(price);
+            updates.price = isNaN(parsedPrice) ? 0 : parsedPrice;
+        }
         if (currency !== undefined) updates.currency = currency;
         if (sku !== undefined) updates.sku = sku;
         if (tags !== undefined) updates.tags = tags;
-        if (quantity !== undefined) updates.quantity = parseInt(quantity);
+        if (quantity !== undefined) {
+            const parsedQty = parseInt(quantity);
+            updates.quantity = isNaN(parsedQty) ? 0 : parsedQty;
+        }
         if (status !== undefined) updates.status = status;
         if (req.file) updates.image = `/uploads/${req.file.filename}`;
 
-        const [updated] = await db("products").where("id", id).update(updates).returning("*");
+        const result = await db("products")
+            .where({ id, owner_id: req.user.id })
+            .update(updates)
+            .returning("*");
+
+        const updated = Array.isArray(result) ? result[0] : result;
+
+        if (!updated) {
+            res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Product not found or no changes made",
+            });
+            return;
+        }
 
         updated.image = buildImageUrl(req, updated.image);
 
@@ -206,12 +226,13 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
             message: "Product updated successfully",
             data: updated,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Update Product Error:", error);
         res.status(500).json({
             status: 500,
             success: false,
             message: "Failed to update product",
+            error: error.message,
         });
     }
 };
