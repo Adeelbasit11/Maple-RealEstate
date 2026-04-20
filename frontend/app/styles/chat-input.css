@@ -1,0 +1,82 @@
+/* ── Chat Input Bar ── */
+.chat-input-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    background: var(--chat-bg-glass);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--chat-border-color);
+}
+.chat-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+.chat-input {
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--chat-bg-input);
+    border: 2px solid var(--chat-border-color);
+    border-radius: var(--chat-radius-lg);
+    color: var(--chat-text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    resize: none;
+    min-height: 48px;
+    max-height: 120px;
+    transition: border-color var(--chat-transition-fast), box-shadow var(--chat-transition-fast);
+}
+.chat-input::placeholder {
+    color: var(--chat-text-muted);
+}
+.chat-input:focus {
+    border-color: var(--chat-accent-primary);
+    box-shadow: 0 0 0 4px var(--chat-accent-glow);
+}
+
+/* ── Send Button ── */
+.chat-send-btn {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--chat-accent-gradient);
+    background-size: 200% 200%;
+    border: none;
+    border-radius: var(--chat-radius-md);
+    color: white;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--chat-transition-fast);
+    box-shadow: 0 2px 12px var(--chat-accent-glow);
+}
+.chat-send-btn:hover:not(:disabled) {
+    background: var(--chat-accent-gradient-hover);
+    box-shadow: 0 4px 24px var(--chat-accent-glow-strong);
+    transform: translateY(-1px);
+}
+.chat-send-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.96);
+}
+.chat-send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+.chat-send-btn svg {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--chat-transition-fast);
+}
+.chat-send-btn:hover:not(:disabled) svg {
+    transform: translateX(1px);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .chat-input-bar {
+        padding: 12px 16px;
+    }
+}

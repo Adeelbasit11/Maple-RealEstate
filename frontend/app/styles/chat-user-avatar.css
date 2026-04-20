@@ -1,0 +1,54 @@
+/* ── Chat User Avatar ── */
+.chat-user-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+.chat-user-avatar-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    line-height: 1;
+    user-select: none;
+}
+.chat-user-avatar-circle.size-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+}
+.chat-user-avatar-circle.size-md {
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+}
+.chat-user-avatar-circle.size-lg {
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
+}
+
+/* ── Online Status Dot ── */
+.chat-avatar-status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--chat-bg-secondary);
+    background: var(--chat-online-green);
+    box-shadow: 0 0 6px var(--chat-online-glow);
+    animation: chatPulse 2s ease-in-out infinite;
+}
+.chat-avatar-status-dot.offline {
+    background: var(--chat-offline-gray);
+    box-shadow: none;
+    animation: none;
+}
+.chat-avatar-status-dot.size-sm {
+    width: 8px;
+    height: 8px;
+}

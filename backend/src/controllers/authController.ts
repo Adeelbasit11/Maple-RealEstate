@@ -352,7 +352,7 @@ export const validateResetToken = async (req: Request, res: Response): Promise<v
 // ===============================
 export const updateProfile = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { name, username, phone, city, country, zipCode, bio, timezone } = req.body;
+        const { name, lastName, username, phone, city, country, zipCode, bio, timezone } = req.body;
         const userId = req.user.id;
 
         const user = await db("auth_users").where("id", userId).where("is_deleted", false).first();
@@ -367,40 +367,107 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
         }
 
         const updates: Record<string, any> = { updated_at: new Date() };
-        if (name) updates.name = name;
-        if (username) updates.username = username;
-        if (phone) updates.phone = phone;
-        if (city) updates.city = city;
-        if (country) updates.country = country;
-        if (zipCode) updates.zip_code = zipCode;
-        if (bio) updates.bio = bio;
-        if (timezone) updates.timezone = timezone;
+        if (name !== undefined) updates.name = name;
+        if (lastName !== undefined) updates.last_name = lastName;
+        if (username !== undefined) updates.username = username;
+        if (phone !== undefined) updates.phone = phone;
+        if (city !== undefined) updates.city = city;
+        if (country !== undefined) updates.country = country;
+        if (zipCode !== undefined) updates.zip_code = zipCode;
+        if (bio !== undefined) updates.bio = bio;
+        if (timezone !== undefined) updates.timezone = timezone;
         if (req.file) updates.profile_image = `uploads/${req.file.filename}`;
 
         const [updated] = await db("auth_users").where("id", userId).update(updates).returning("*");
+
+        delete updated.password;
+        delete updated.resetPasswordToken;
+        delete updated.resetPasswordExpire;
+        updated.profileImage = buildImageUrl(req, updated.profileImage);
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Profile updated successfully",
-            data: {
-                name: updated.name,
-                email: updated.email,
-                username: updated.username,
-                phone: updated.phone,
-                city: updated.city,
-                country: updated.country,
-                zipCode: updated.zipCode,
-                bio: updated.bio,
-                timezone: updated.timezone,
-                profileImage: buildImageUrl(req, updated.profileImage),
-            },
+            data: updated,
         });
     } catch (error) {
         res.status(500).json({
             status: 500,
             success: false,
             message: "Error updating profile",
+        });
+    }
+};
+
+// ===============================
+// CHANGE PASSWORD (logged-in user)
+// ===============================
+export const changePassword = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id;
+
+        if (!currentPassword || !newPassword) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Current password and new password are required",
+            });
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "New password must be at least 8 characters",
+            });
+            return;
+        }
+
+        const user = await db("auth_users").where("id", userId).where("is_deleted", false).first();
+        if (!user) {
+            res.status(404).json({ status: 404, success: false, message: "User not found" });
+            return;
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Current password is incorrect",
+            });
+            return;
+        }
+
+        const isSame = await bcrypt.compare(newPassword, user.password);
+        if (isSame) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "New password cannot be the same as current password",
+            });
+            return;
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await db("auth_users").where("id", userId).update({
+            password: hashedPassword,
+            updated_at: new Date(),
+        });
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Password changed successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to change password",
         });
     }
 };

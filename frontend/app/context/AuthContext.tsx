@@ -97,7 +97,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const isFormData = profileData instanceof FormData;
             const res = await axios.put(CONFIG.AUTH_ENDPOINTS.UPDATE_PROFILE, profileData, {
                 withCredentials: true,
-                headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' }
+                ...(isFormData ? {} : { headers: { 'Content-Type': 'application/json' } }),
             });
             if (res.data.success) {
                 setUser(res.data.data);
@@ -106,6 +106,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return { success: false, message: res.data.message };
         } catch (error: any) {
             return { success: false, message: error.response?.data?.message || "Update failed" };
+        }
+    };
+
+    const changePassword = async (currentPassword: string, newPassword: string) => {
+        try {
+            const res = await axios.post(
+                CONFIG.AUTH_ENDPOINTS.CHANGE_PASSWORD,
+                { currentPassword, newPassword },
+                { withCredentials: true }
+            );
+            if (res.data.success) {
+                return { success: true, message: res.data.message };
+            }
+            return { success: false, message: res.data.message };
+        } catch (error: any) {
+            return { success: false, message: error.response?.data?.message || "Failed to change password" };
         }
     };
 
@@ -128,6 +144,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 verifyResetToken,
                 resetPassword,
                 updateProfile,
+                changePassword,
                 updateUserContext,
                 refreshUser: fetchUser,
             }}

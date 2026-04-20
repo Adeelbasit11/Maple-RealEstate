@@ -1,0 +1,81 @@
+/* ── Chat Page Layout ── */
+.chat-layout {
+    display: flex;
+    height: calc(100vh - 0px);
+    width: 100%;
+    overflow: hidden;
+    background: var(--chat-bg-primary);
+    position: relative;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--chat-text-primary);
+}
+
+.chat-layout::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 1000px 700px at 10% 10%, rgba(124, 58, 237, 0.06), transparent),
+        radial-gradient(ellipse 800px 600px at 90% 90%, rgba(99, 102, 241, 0.04), transparent);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── Mobile Sidebar Toggle ── */
+.chat-sidebar-toggle-btn {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 50;
+    width: 42px;
+    height: 42px;
+    background: var(--chat-bg-glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--chat-border-color);
+    border-radius: var(--chat-radius-md);
+    color: var(--chat-text-primary);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--chat-transition-fast);
+}
+
+.chat-sidebar-toggle-btn:hover {
+    background: var(--chat-bg-hover);
+    border-color: var(--chat-border-active);
+}
+
+/* ── No Room Selected ── */
+.chat-no-room-selected {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--chat-text-muted);
+    z-index: 1;
+}
+
+.chat-no-room-icon {
+    font-size: 64px;
+    animation: chatFloat 3s ease-in-out infinite;
+}
+
+.chat-no-room-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--chat-text-secondary);
+}
+
+.chat-no-room-subtitle {
+    font-size: 14px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .chat-sidebar-toggle-btn {
+        display: flex;
+    }
+}

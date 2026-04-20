@@ -9,6 +9,7 @@ import {
     validateResetToken,
     logout,
     updateProfile,
+    changePassword,
     verifyInvite,
     registerInvited,
 } from "../controllers/authController";
@@ -37,6 +38,9 @@ router.post("/reset-password/:token", resetPassword);
 
 // UPDATE PROFILE
 router.put("/profile", authenticate, upload.single("profileImage"), updateProfile);
+
+// CHANGE PASSWORD
+router.post("/change-password", authenticate, changePassword);
 
 // INVITATION ROUTES
 router.get("/verify-invite/:token", verifyInvite);

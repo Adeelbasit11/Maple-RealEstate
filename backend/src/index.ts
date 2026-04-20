@@ -6,6 +6,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
+import { createServer } from "http";
 
 // Database
 import connectDB from "./config/database";
@@ -16,11 +17,17 @@ import usersRoutes from "./routes/users";
 import teamRoutes from "./routes/team";
 import productRoutes from "./routes/products";
 import ordersRoutes from "./routes/orders";
+import chatRoutes from "./routes/chatRoutes";
+import directMessageRoutes from "./routes/directMessageRoutes";
+
+// Socket.IO
+import { initializeSocket } from "./utils/socket";
 
 // Database
 connectDB();
 
 const app = express();
+const httpServer = createServer(app);
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -50,9 +57,19 @@ app.use("/api/team", teamRoutes);
 app.use("/api/stripe", stripeRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api", ordersRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/direct", directMessageRoutes);
 
-// SERVER
-app.listen(PORT, () => {
+// Health check for Socket.IO
+app.get("/health", (req, res) => {
+    res.json({ status: "ok" });
+});
+
+// Initialize Socket.IO
+initializeSocket(httpServer);
+
+// SERVER (use httpServer instead of app.listen for Socket.IO)
+httpServer.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 

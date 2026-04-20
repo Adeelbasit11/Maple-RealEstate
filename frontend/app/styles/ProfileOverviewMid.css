@@ -1,0 +1,229 @@
+.po-mid-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 32px;
+    gap: 24px;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #f8f9fc;
+
+    /* Hide scrollbar */
+    scrollbar-width: none;
+}
+
+.po-mid-container::-webkit-scrollbar {
+    display: none;
+}
+
+.po-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.po-title {
+    color: #8b5cf6;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.po-search-bar {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 8px 16px;
+    width: 300px;
+}
+
+.po-search-bar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.po-search-bar .search-icon {
+    color: #94a3b8;
+}
+
+/* Stat Cards Row */
+.po-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.po-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.04);
+}
+
+.po-stat-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.po-stat-chart-container {
+    width: 60px;
+    height: 50px;
+}
+
+.po-stat-info {
+    text-align: right;
+}
+
+.po-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.po-stat-percentage {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.po-stat-label {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.text-purple { color: #8b5cf6; }
+.text-green { color: #10b981; }
+.text-red { color: #ef4444; }
+
+/* Grid Main Area */
+.po-main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+}
+
+.po-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.po-card-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.po-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.po-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.po-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.po-legend-dot.red { background-color: #ef4444; }
+.po-legend-dot.purple { background-color: #8b5cf6; }
+
+.po-actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.po-action-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.po-action-value {
+    color: #8b5cf6;
+    font-weight: 500;
+}
+
+.po-card-icon {
+    width: 20px;
+    height: 20px;
+    background: #8b5cf6;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Secondary Grids */
+.po-secondary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.po-card-tabs {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+}
+.po-card-tabs span {
+    color: #cbd5e1;
+    cursor: pointer;
+}
+.po-card-tabs span.active {
+    color: #8b5cf6;
+    font-weight: 500;
+}
+
+/* Bottom Grid */
+.po-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 24px;
+}
+
+/* Gender Chart Footer */
+.po-gender-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.po-gender-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.po-gender-stat-val p {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+.po-gender-stat-val span {
+    font-size: 11px;
+    color: #94a3b8;
+}

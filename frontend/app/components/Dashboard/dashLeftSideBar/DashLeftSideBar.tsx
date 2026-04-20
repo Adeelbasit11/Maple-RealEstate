@@ -35,16 +35,25 @@ const DashLeftSideBar = () => {
     // Auto-expand menus based on current path
     useEffect(() => {
         const homePaths = ["/", "/team", "/users", "/pricing"];
+        const pagesPaths = ["/pages/profile", "/pages/users", "/pages/account"];
+        const profilePaths = ["/pages/profile"];
+        const usersPaths = ["/pages/users"];
+        const accountPaths = ["/pages/account"];
         const ecommercePaths = ["/ecommerce/overview", "/ecommerce/products/new", "/ecommerce/products/edit", "/ecommerce/products/list", "/ecommerce/orders/list", "/ecommerce/orders/detail"];
         const productPaths = ["/ecommerce/products/new", "/ecommerce/products/edit", "/ecommerce/products/list"];
         const orderPaths = ["/ecommerce/orders/list", "/ecommerce/orders/detail"];
 
         if (homePaths.includes(pathname)) {
             setOpenMenu("home");
-        } else if (ecommercePaths.some(p => pathname.startsWith(p))) {
+        } else if (pagesPaths.some(p => pathname?.startsWith(p))) {
+            setOpenMenu("pages");
+            if (profilePaths.some(p => pathname?.startsWith(p))) setOpenSubMenu("profile");
+            else if (usersPaths.some(p => pathname?.startsWith(p))) setOpenSubMenu("users");
+            else if (accountPaths.some(p => pathname?.startsWith(p))) setOpenSubMenu("account");
+        } else if (ecommercePaths.some(p => pathname?.startsWith(p))) {
             setOpenMenu("ecommerce");
-            if (productPaths.some(p => pathname.startsWith(p))) setOpenSubMenu("products");
-            else if (orderPaths.some(p => pathname.startsWith(p))) setOpenSubMenu("orders");
+            if (productPaths.some(p => pathname?.startsWith(p))) setOpenSubMenu("products");
+            else if (orderPaths.some(p => pathname?.startsWith(p))) setOpenSubMenu("orders");
         }
     }, [pathname]);
 
@@ -114,6 +123,121 @@ const DashLeftSideBar = () => {
                                 </Link>
                                  <Link href="/pricing" className={`submenu-link ${pathname === "/pricing" ? "active" : ""}`}>
                                     Pricing
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* PAGES */}
+                    <div className="menu-group">
+                        <button
+                            className={`menu-item ${openMenu === "pages" ? "active" : ""}`}
+                            onClick={() => toggleMenu("pages")}
+                        >
+                            <span className="menu-link">
+                                <FileText size={18} />
+                                <span>Pages</span>
+                            </span>
+                            <ChevronDown
+                                size={14}
+                                className={`arrow ${openMenu === "pages" ? "rotate" : ""}`}
+                            />
+                        </button>
+
+                        {openMenu === "pages" && (
+                            <div className="submenu">
+                                {/* Profile */}
+                                <div className="submenu-item">
+                                    <button
+                                        className={`submenu-link flex-between ${openSubMenu === "profile" ? "active" : ""}`}
+                                        onClick={() => toggleSubMenu("profile")}
+                                    >
+                                        <span>Profile</span>
+                                        <ChevronDown
+                                            size={12}
+                                            className={`arrow ${openSubMenu === "profile" ? "rotate" : ""}`}
+                                        />
+                                    </button>
+                                    {openSubMenu === "profile" && (
+                                        <div className="nested-submenu">
+                                            <Link href="/pages/profile/overview" className={`nested-link ${pathname === "/pages/profile/overview" ? "active" : ""}`}>
+                                                Overview
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Users */}
+                                {/* <div className="submenu-item">
+                                    <button
+                                        className={`submenu-link flex-between ${openSubMenu === "users" ? "active" : ""}`}
+                                        onClick={() => toggleSubMenu("users")}
+                                    >
+                                        <span>Users</span>
+                                        <ChevronDown
+                                            size={12}
+                                            className={`arrow ${openSubMenu === "users" ? "rotate" : ""}`}
+                                        />
+                                    </button>
+                                    {openSubMenu === "users" && (
+                                        <div className="nested-submenu">
+                                            <Link href="/pages/users/list" className={`nested-link ${pathname === "/pages/users/list" ? "active" : ""}`}>
+                                                List
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div> */}
+
+                                {/* Account */}
+                                <div className="submenu-item">
+                                    <button
+                                        className={`submenu-link flex-between ${openSubMenu === "account" ? "active" : ""}`}
+                                        onClick={() => toggleSubMenu("account")}
+                                    >
+                                        <span>Account</span>
+                                        <ChevronDown
+                                            size={12}
+                                            className={`arrow ${openSubMenu === "account" ? "rotate" : ""}`}
+                                        />
+                                    </button>
+                                    {openSubMenu === "account" && (
+                                        <div className="nested-submenu">
+                                            <Link href="/pages/account/setting" className={`nested-link ${pathname === "/pages/account/setting" ? "active" : ""}`}>
+                                                Setting
+                                            </Link>
+                                           
+                                            <Link href="/pages/account/security" className={`nested-link ${pathname === "/pages/account/security" ? "active" : ""}`}>
+                                                Security
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Projects */}
+                                {/* <div className="submenu-item">
+                                    <button
+                                        className={`submenu-link flex-between ${openSubMenu === "projects" ? "active" : ""}`}
+                                        onClick={() => toggleSubMenu("projects")}
+                                    >
+                                        <span>Projects</span>
+                                        <ChevronDown
+                                            size={12}
+                                            className={`arrow ${openSubMenu === "projects" ? "rotate" : ""}`}
+                                        />
+                                    </button>
+                                </div> */}
+
+                                {/* <Link href="/pages/pricing" className={`submenu-link ${pathname === "/pages/pricing" ? "active" : ""}`}>
+                                    Pricing page
+                                </Link>
+                                <Link href="/pages/charts" className={`submenu-link ${pathname === "/pages/charts" ? "active" : ""}`}>
+                                    Charts
+                                </Link>
+                                <Link href="/pages/notification" className={`submenu-link ${pathname === "/pages/notification" ? "active" : ""}`}>
+                                    Notification
+                                </Link> */}
+                                <Link href="/pages/chat" className={`submenu-link ${pathname === "/pages/chat" ? "active" : ""}`}>
+                                    Chat
                                 </Link>
                             </div>
                         )}

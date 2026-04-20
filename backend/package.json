@@ -4,7 +4,7 @@
   "description": "Express + TypeScript + PostgreSQL Backend",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "nodemon --ext ts,json --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "migrate": "knex --knexfile knexfile.ts migrate:latest",
@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cookie": "^1.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -25,10 +26,12 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.13",
     "pg": "^8.20.0",
+    "socket.io": "^4.8.3",
     "stripe": "^20.4.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/cookie": "^0.6.0",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",

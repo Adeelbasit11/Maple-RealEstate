@@ -1,0 +1,31 @@
+/* ── Chat Theme Toggle Button ── */
+.chat-theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: var(--chat-radius-md);
+    background: var(--chat-bg-tertiary);
+    border: 1px solid var(--chat-border-color);
+    cursor: pointer;
+    transition: all var(--chat-transition-fast);
+    color: var(--chat-text-primary);
+}
+.chat-theme-toggle:hover {
+    background: var(--chat-bg-hover);
+    border-color: var(--chat-border-active);
+    box-shadow: 0 0 15px var(--chat-accent-glow);
+}
+.chat-theme-toggle:active {
+    transform: scale(0.95);
+}
+.chat-theme-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--chat-transition-fast);
+}
+.chat-theme-toggle:hover .chat-theme-icon {
+    transform: rotate(20deg);
+}

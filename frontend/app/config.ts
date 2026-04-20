@@ -7,6 +7,7 @@ const CONFIG = {
         CHECK_LOGIN: "/api/auth/me",
         LOGOUT: "/api/auth/logout",
         UPDATE_PROFILE: "/api/auth/profile",
+        CHANGE_PASSWORD: "/api/auth/change-password",
         VERIFY_INVITE: "/api/auth/verify-invite",
         REGISTER_INVITED: "/api/auth/register-invited",
         FORGOT_PASSWORD: "/api/auth/forgot-password",

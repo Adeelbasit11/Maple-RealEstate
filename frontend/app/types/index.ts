@@ -1,6 +1,7 @@
 export interface IUser {
     _id: string;
     name: string;
+    lastName?: string;
     email: string;
     phone?: string;
     username?: string;
@@ -56,6 +57,7 @@ export interface IAuthContext {
     verifyResetToken: (token: string) => Promise<{ success: boolean; message: string }>;
     resetPassword: (token: string, password: string) => Promise<{ success: boolean; message: string }>;
     updateProfile: (profileData: any) => Promise<{ success: boolean; message: string }>;
+    changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
     updateUserContext: (newData: Partial<IUser>) => void;
     refreshUser: () => Promise<void>;
 }
