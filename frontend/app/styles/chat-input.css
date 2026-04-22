@@ -1,82 +1,115 @@
 /* ── Chat Input Bar ── */
 .chat-input-bar {
     display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    padding: 16px 24px;
-    background: var(--chat-bg-glass);
-    backdrop-filter: blur(16px);
-    border-top: 1px solid var(--chat-border-color);
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--chat-border);
+    background: var(--chat-bg-white);
 }
-.chat-input-wrapper {
-    flex: 1;
-    position: relative;
-}
+
 .chat-input {
-    width: 100%;
-    padding: 14px 18px;
-    background: var(--chat-bg-input);
-    border: 2px solid var(--chat-border-color);
-    border-radius: var(--chat-radius-lg);
+    flex: 1;
+    padding: 11px 18px;
+    background: #f8f8fb;
+    border: 1px solid #e8e4f4;
+    border-radius: 8px;
     color: var(--chat-text-primary);
     font-family: inherit;
     font-size: 14px;
     outline: none;
-    resize: none;
-    min-height: 48px;
-    max-height: 120px;
-    transition: border-color var(--chat-transition-fast), box-shadow var(--chat-transition-fast);
+    transition: border-color var(--chat-transition);
 }
-.chat-input::placeholder {
-    color: var(--chat-text-muted);
-}
-.chat-input:focus {
-    border-color: var(--chat-accent-primary);
-    box-shadow: 0 0 0 4px var(--chat-accent-glow);
+.chat-input::placeholder { color: #b0adc4; }
+.chat-input:focus { border-color: var(--chat-accent); background: #fff; }
+.chat-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ── Send Button ── */
 .chat-send-btn {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--chat-accent-gradient);
-    background-size: 200% 200%;
+    background: var(--chat-accent);
     border: none;
-    border-radius: var(--chat-radius-md);
-    color: white;
+    border-radius: 50%;
+    color: #fff;
     cursor: pointer;
     flex-shrink: 0;
-    transition: all var(--chat-transition-fast);
-    box-shadow: 0 2px 12px var(--chat-accent-glow);
+    transition: all var(--chat-transition);
 }
-.chat-send-btn:hover:not(:disabled) {
-    background: var(--chat-accent-gradient-hover);
-    box-shadow: 0 4px 24px var(--chat-accent-glow-strong);
-    transform: translateY(-1px);
+.chat-send-btn:hover:not(:disabled) { background: #6d28d9; transform: scale(1.05); }
+.chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Mic Button ── */
+.chat-mic-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--chat-accent);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--chat-transition);
 }
-.chat-send-btn:active:not(:disabled) {
-    transform: translateY(0) scale(0.96);
+.chat-mic-btn:hover:not(:disabled) { background: #6d28d9; transform: scale(1.05); }
+.chat-mic-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Recording Bar ── */
+.chat-recording-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    padding: 4px 0;
 }
-.chat-send-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
+.chat-recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ef4444;
 }
-.chat-send-btn svg {
-    width: 20px;
-    height: 20px;
-    transition: transform var(--chat-transition-fast);
+.chat-recording-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: chatRecordPulse 1s infinite;
 }
-.chat-send-btn:hover:not(:disabled) svg {
-    transform: translateX(1px);
+.chat-recording-time {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--chat-text-primary);
+    font-variant-numeric: tabular-nums;
 }
+.chat-stop-record-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--chat-accent);
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all var(--chat-transition);
+    margin-left: auto;
+}
+.chat-stop-record-btn:hover { background: #6d28d9; }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
-    .chat-input-bar {
-        padding: 12px 16px;
-    }
+@media (max-width: 900px) {
+    .chat-input-bar { padding: 10px 14px; }
 }

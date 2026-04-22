@@ -1,5 +1,7 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
+import fs from "fs";
+import path from "path";
 import {
     updateUserStatus,
     getOnlineUsers,
@@ -28,6 +30,7 @@ export function initializeSocket(httpServer: HttpServer): void {
             credentials: true,
         },
         transports: ["websocket", "polling"],
+        maxHttpBufferSize: 10 * 1024 * 1024, // 10MB for voice messages
     });
 
     // Seed default rooms
@@ -49,7 +52,7 @@ export function initializeSocket(httpServer: HttpServer): void {
             const user = await db("auth_users")
                 .where("id", decoded.id)
                 .where("is_deleted", false)
-                .select("id", "username", "name", "avatar")
+                .select("id", "username", "name", "email", "avatar")
                 .first();
 
             if (!user) return next(new Error("Authentication error: User not found"));
@@ -57,6 +60,7 @@ export function initializeSocket(httpServer: HttpServer): void {
             (socket as any).user = {
                 id: user.id || user._id,
                 username: user.username || user.name,
+                email: user.email || "",
                 avatar: user.avatar || "",
             };
             next();
@@ -100,6 +104,7 @@ export function initializeSocket(httpServer: HttpServer): void {
             user: {
                 id: user.id,
                 username: user.username,
+                email: user.email,
                 avatar: user.avatar,
             },
             rooms,
@@ -133,16 +138,20 @@ export function initializeSocket(httpServer: HttpServer): void {
         });
 
         // ── User sends a message ──
-        socket.on("chat:message", async (data: { roomId: string; content: string }) => {
-            const { roomId, content } = data;
+        socket.on("chat:message", async (data: { roomId: string; content: string; type?: string; audioUrl?: string; audioDuration?: number }) => {
+            const { roomId, content, type, audioUrl, audioDuration } = data;
             if (!content || content.trim().length === 0) return;
 
+            const msgType = (type === "voice" ? "voice" : "text") as "text" | "system" | "voice";
             const message = await addMessage(
                 roomId,
                 user.id,
                 user.username,
                 user.avatar,
-                content.trim()
+                content.trim(),
+                msgType,
+                audioUrl,
+                audioDuration
             );
 
             // Mark this message as read for the sender immediately
@@ -161,6 +170,66 @@ export function initializeSocket(httpServer: HttpServer): void {
 
             // Then send rooms update
             io.emit("rooms:update", await getAllRooms());
+        });
+
+        // ── User sends a voice message via socket ──
+        socket.on("chat:voice-upload", async (
+            data: { roomId: string; audioData: string; duration: number },
+            callback?: (res: { success: boolean; audioUrl?: string; error?: string }) => void
+        ) => {
+            try {
+                const { roomId, audioData, duration } = data;
+                if (!audioData || !roomId) {
+                    callback?.({ success: false, error: "Missing data" });
+                    return;
+                }
+
+                // Save base64 audio to file
+                const voiceDir = path.join(__dirname, "../../uploads/voice");
+                if (!fs.existsSync(voiceDir)) {
+                    fs.mkdirSync(voiceDir, { recursive: true }); // ye 
+                }
+                const filename = `voice_${Date.now()}_${Math.random().toString(36).slice(2)}.webm`;
+                const filePath = path.join(voiceDir, filename);
+                const buffer = Buffer.from(audioData, "base64");
+                fs.writeFileSync(filePath, buffer);
+
+                const audioUrl = `/uploads/voice/${filename}`;
+
+                // Save as voice message
+                const message = await addMessage(
+                    roomId,
+                    user.id,
+                    user.username,
+                    user.avatar,
+                    "🎤 Voice message",
+                    "voice",
+                    audioUrl,
+                    duration
+                );
+
+                // Mark as read for sender
+                await db("chat_read_messages")
+                    .insert({ message_id: message.id, user_id: user.id })
+                    .onConflict(["message_id", "user_id"])
+                    .ignore();
+
+                // Broadcast to room
+                io.to(roomId).emit("chat:message", message);
+
+                // Update unread counts
+                for (const connectedUser of connectedUsers.values()) {
+                    const counts = await getUnreadCountsForAllRooms(connectedUser.userId);
+                    io.to(`user:${connectedUser.userId}`).emit("chat:unread-counts-updated", counts);
+                }
+
+                io.emit("rooms:update", await getAllRooms());
+
+                callback?.({ success: true, audioUrl });
+            } catch (error) {
+                console.error("Voice upload socket error:", error);
+                callback?.({ success: false, error: "Failed to save voice message" });
+            }
         });
 
         // ── User edits a message ──

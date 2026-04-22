@@ -94,13 +94,16 @@
 .team-table-wrap {
     background: #fff;
     border-radius: 18px;
-    overflow: hidden;
+    /* overflow: hidden; */
+        overflow-x: auto;
+
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
     margin-bottom: 20px;
 }
 
 .team-table {
     width: 100%;
+        min-width: 700px;
     border-collapse: collapse;
 }
 
@@ -214,4 +217,96 @@
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+/* Large Tablets */
+@media (max-width: 1200px) {
+    .team-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* Tablets */
+@media (max-width: 768px) {
+    .team-page {
+        padding: 20px;
+    }
+
+    .team-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-create {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .team-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .team-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    /* Table scroll (IMPORTANT) */
+    .team-table-wrap {
+        overflow-x: auto;
+    }
+
+    .team-table {
+        min-width: 700px;
+    }
+
+    .team-pagination {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+/* Mobile */
+@media (max-width: 480px) {
+    .team-page {
+        padding: 15px;
+    }
+
+    .team-title {
+        font-size: 20px;
+    }
+
+    .team-subtitle {
+        font-size: 12px;
+    }
+
+    .team-page .stat-card {
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .team-page .stat-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .team-page .search-box {
+        padding: 8px 12px;
+    }
+
+    /* Modal Fix */
+    .team-page .modal-box {
+        max-width: 100%;
+        border-radius: 16px;
+        padding: 10px;
+    }
 }

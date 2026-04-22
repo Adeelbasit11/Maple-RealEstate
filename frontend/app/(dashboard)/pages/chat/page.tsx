@@ -10,7 +10,7 @@ export default function ChatPageRoute() {
         <ProtectedRoute>
             <div className="dashboard-layout">
                 <DashLeftSideBar />
-                <div style={{ flex: 1, overflow: "hidden" }}>
+                <div style={{ flex: 1, overflow: "hidden", height: "100vh", display: "flex", flexDirection: "column" }}>
                     <ChatPage />
                 </div>
             </div>

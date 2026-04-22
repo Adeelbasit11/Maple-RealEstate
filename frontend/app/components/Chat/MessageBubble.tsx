@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChatMessage } from "../../types/chat";
 import { useChat } from "../../context/ChatContext";
 import UserAvatar from "./UserAvatar";
+import VoiceMessagePlayer from "./VoiceMessagePlayer";
 import { Pencil, Trash2, X, Check } from "lucide-react";
 import "../../styles/chat-message-bubble.css";
 
@@ -25,7 +26,11 @@ export default function MessageBubble({
 
     const formatTime = (timestamp: string) => {
         const date = new Date(timestamp);
-        return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        const h = date.getHours();
+        const m = date.getMinutes().toString().padStart(2, "0");
+        const ampm = h >= 12 ? "pm" : "am";
+        const hour12 = h % 12 || 12;
+        return `${hour12.toString().padStart(2, "0")}:${m} ${ampm}`;
     };
 
     const handleEdit = () => {
@@ -54,29 +59,30 @@ export default function MessageBubble({
         );
     }
 
+    const isVoice = message.type === "voice" && message.audioUrl;
+
     return (
         <div
             className={`chat-message-wrapper ${isSent ? "sent" : "received"} ${
                 showSender ? "message-group-gap" : ""
             }`}
         >
+            {/* Inner group — limits max-width, holds avatar + bubble */}
+            <div className="chat-message-inner">
+            {/* Avatar on LEFT for received messages */}
             {!isSent && showSender && (
                 <UserAvatar
                     username={message.senderName}
                     avatarColor={message.senderAvatar}
-                    isOnline={true}
+                    isOnline={false}
                     size="sm"
                     showStatus={false}
                 />
             )}
-            {!isSent && !showSender && <div style={{ width: 32 }} />}
+            {!isSent && !showSender && <div className="chat-avatar-spacer" />}
 
             <div className={`chat-message-bubble-container ${isSent ? "sent" : "received"}`}>
                 <div className={`chat-message-bubble ${isSent ? "sent" : "received"} ${isEditing ? "editing" : ""}`}>
-                    {showSender && (
-                        <div className="chat-msg-sender">{message.senderName}</div>
-                    )}
-
                     {isEditing ? (
                         <div className="chat-edit-input-wrapper">
                             <textarea
@@ -102,18 +108,17 @@ export default function MessageBubble({
                                 </button>
                             </div>
                         </div>
+                    ) : isVoice ? (
+                        <VoiceMessagePlayer
+                            audioUrl={message.audioUrl!}
+                            duration={message.audioDuration}
+                        />
                     ) : (
-                        <>
-                            <div className="chat-msg-content">{message.content}</div>
-                            <div className="chat-msg-footer">
-                                {message.isEdited && <span className="chat-edited-label">(edited)</span>}
-                                <div className="chat-msg-time">{formatTime(message.timestamp)}</div>
-                            </div>
-                        </>
+                        <div className="chat-msg-content">{message.content}</div>
                     )}
 
                     {/* Action buttons (only for sender) */}
-                    {isSent && !isEditing && !showConfirmDelete && (
+                    {isSent && !isEditing && !showConfirmDelete && !isVoice && (
                         <div className="chat-message-actions-overlay">
                             <button onClick={() => setIsEditing(true)} className="chat-msg-action-btn" title="Edit">
                                 <Pencil size={12} />
@@ -123,6 +128,12 @@ export default function MessageBubble({
                             </button>
                         </div>
                     )}
+                </div>
+
+                {/* Time + edited label */}
+                <div className="chat-msg-footer">
+                    {message.isEdited && <span className="chat-edited-label">(edited)</span>}
+                    <span className="chat-msg-time">{formatTime(message.timestamp)}</span>
                 </div>
 
                 {/* Delete confirmation */}
@@ -136,6 +147,19 @@ export default function MessageBubble({
                     </div>
                 )}
             </div>
+
+            {/* Avatar on right for sent */}
+            {isSent && showSender && (
+                <UserAvatar
+                    username={message.senderName}
+                    avatarColor={message.senderAvatar}
+                    isOnline={true}
+                    size="sm"
+                    showStatus={false}
+                />
+            )}
+            {isSent && !showSender && <div className="chat-avatar-spacer" />}
+            </div>{/* end chat-message-inner */}
         </div>
     );
 }

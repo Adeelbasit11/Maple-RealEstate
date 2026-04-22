@@ -1,247 +1,322 @@
-.pricing-container {
-    padding: 80px 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+/* =============================
+   PRICING PAGE — Dashboard Style
+============================= */
+.pricing-page {
+    flex: 1;
+    padding: 28px 36px;
+    background: #f4f2f7;
+    min-height: 100vh;
+    overflow-y: auto;
     font-family: 'Inter', sans-serif;
 }
 
-.pricing-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.pricing-header h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 16px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.pricing-header p {
-    font-size: 1.25rem;
-    color: #666;
-    text-align: center;
-}
-
-.plans-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-}
-
-.plan-card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 24px;
-    padding: 40px;
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-}
-
-.plan-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    border-color: #ddd;
-}
-
-.plan-card.popular {
-    border: 2px solid #a855f7;
-    background: linear-gradient(to bottom, #ffffff, #faf5ff);
-}
-
-.popular-badge {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #a855f7;
-    color: #fff;
-    padding: 4px 16px;
-    border-radius: 99px;
-    font-size: 0.875rem;
-    font-weight: 600;
-}
-
-.plan-icon {
-    margin-bottom: 24px;
-}
-
-.plan-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.plan-price {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 16px;
-}
-
-.plan-price span {
-    font-size: 1rem;
-    color: #666;
-    font-weight: 400;
-}
-
-.plan-description {
-    color: #666;
-    margin-bottom: 32px;
-    min-height: 48px;
-}
-
-.plan-features {
-    list-style: none;
-    margin-bottom: 40px;
-    flex-grow: 1;
-}
-
-.feature-item {
+/* ── Page Header ── */
+.pricing-page-header {
     display: flex;
     align-items: center;
-    margin-bottom: 16px;
-    color: #333;
+    justify-content: space-between;
+    margin-bottom: 28px;
 }
 
-.feature-icon {
-    margin-right: 12px;
-    color: #10b981;
-}
-
-.subscribe-btn {
-    width: 100%;
-    padding: 16px;
-    border-radius: 12px;
+.pricing-page-title {
+    font-size: 24px;
     font-weight: 700;
-    font-size: 1rem;
+    color: #7c3aed;
+    margin: 0;
+}
+
+.pricing-search-bar {
+    position: relative;
+    width: 260px;
+}
+
+.pricing-search-bar input {
+     width: 100%;
+    padding: 10px 40px 10px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    font-size: 13px;
+    color: #6b7280;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.pricing-search-bar input::placeholder {
+    color: #9ca3af;
+}
+
+.pricing-search-bar input:focus {
+    border-color: #7c3aed;
+}
+
+.pricing-search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+/* ── Section Title ── */
+.pricing-section-title {
+    margin-bottom: 32px;
+}
+
+.pricing-section-title h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 6px 0;
+}
+
+.pricing-section-title p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* ── Plans Grid ── */
+.pricing-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+/* ── Card ── */
+.pricing-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s;
+}
+
+.pricing-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.pricing-card-current {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 1px #7c3aed;
+}
+
+/* ── Card Top ── */
+.pricing-card-top {
+    margin-bottom: 28px;
+}
+
+.pricing-card-name {
+    font-size: 26px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+}
+
+.pricing-card-subtitle {
+    font-size: 14px;
+    color: #9ca3af;
+    margin: 0 0 20px 0;
+}
+
+/* ── Buttons ── */
+.pricing-card-btn {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    font-family: inherit;
+}
+
+.pricing-btn-filled {
+    background: #7c3aed;
+    color: #fff;
     border: none;
 }
 
-.btn-blue { 
-    background: #3b82f6; 
-    color: #fff; 
+.pricing-btn-filled:hover:not(:disabled) {
+    background: #6d28d9;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
 }
 
-.btn-blue:hover { 
-    background: #2563eb; 
-}
-
-.btn-purple { 
-    background: #a855f7; 
-    color: #fff; 
-}
-
-.btn-purple:hover { 
-    background: #9333ea; 
-}
-
-.btn-amber { 
-    background: #f59e0b; 
-    color: #fff; 
-}
-
-.btn-amber:hover { 
-    background: #d97706; 
-}
-
-.subscribe-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.skeleton-container {
-    padding: 80px 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.skeleton-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.skeleton-title {
-    height: 50px;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 2s infinite;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.skeleton-subtitle {
-    height: 24px;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 2s infinite;
-    border-radius: 8px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.skeleton-plans {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-}
-
-.skeleton-card {
+.pricing-btn-outlined {
     background: #fff;
-    border: 1px solid #eee;
-    border-radius: 24px;
-    padding: 40px;
-    min-height: 500px;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
 }
 
-.skeleton-card-content {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 2s infinite;
-    border-radius: 8px;
-    margin-bottom: 16px;
+.pricing-btn-outlined:hover:not(:disabled) {
+    border-color: #7c3aed;
+    color: #7c3aed;
 }
 
-.skeleton-icon {
-    height: 40px;
-    margin-bottom: 24px;
+.pricing-card-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
 }
 
-.skeleton-name {
-    height: 28px;
-    margin-bottom: 12px;
+/* ── Feature List ── */
+.pricing-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-grow: 1;
 }
 
-.skeleton-price {
-    height: 50px;
-    margin-bottom: 16px;
+.pricing-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.skeleton-description {
-    height: 48px;
+/* ── Checkbox Icon ── */
+.pricing-checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+
+.pricing-checkbox:not(.filled) {
+    background: #f3f4f6;
+    border: 1.5px solid #d1d5db;
+    color: #d1d5db;
+}
+
+.pricing-checkbox.filled {
+    background: #01c9ec;
+    border: 1.5px solid #00c2e4;
+    color: #fff;
+}
+
+.pricing-feature-text {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 400;
+}
+
+/* =============================
+   SKELETON LOADER
+============================= */
+.pricing-skeleton {
+    padding: 0;
+}
+
+.pricing-skeleton-header {
     margin-bottom: 32px;
 }
 
-.skeleton-features {
-    height: 200px;
-    margin-bottom: 40px;
+.pricing-skeleton-title {
+    height: 24px;
+    width: 160px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: pricingShimmer 2s infinite;
+    border-radius: 8px;
+    margin-bottom: 16px;
 }
 
-.skeleton-button {
-    height: 48px;
+.pricing-skeleton-subtitle {
+    height: 16px;
+    width: 320px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: pricingShimmer 2s infinite;
+    border-radius: 8px;
 }
 
-@keyframes loading {
+.pricing-skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.pricing-skeleton-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 32px 28px;
+    min-height: 420px;
+}
+
+.pricing-skel {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: pricingShimmer 2s infinite;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.pricing-skel-name {
+    height: 32px;
+    width: 70%;
+}
+
+.pricing-skel-sub {
+    height: 14px;
+    width: 40%;
+    margin-bottom: 24px;
+}
+
+.pricing-skel-btn {
+    height: 44px;
+    width: 100%;
+    margin-bottom: 32px;
+    border-radius: 10px;
+}
+
+.pricing-skel-features {
+    height: 220px;
+    width: 100%;
+}
+
+@keyframes pricingShimmer {
     0% { background-position: 200% 0%; }
     100% { background-position: -200% 0%; }
+}
+
+/* =============================
+   RESPONSIVE
+============================= */
+@media (max-width: 1024px) {
+    .pricing-plans-grid,
+    .pricing-skeleton-grid {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+    }
+
+    .pricing-page {
+        padding: 20px 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pricing-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .pricing-search-bar {
+        width: 100%;
+    }
+
+    .pricing-card-name {
+        font-size: 22px;
+    }
 }

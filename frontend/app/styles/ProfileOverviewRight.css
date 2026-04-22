@@ -201,3 +201,24 @@
 .po-accordion-arrow {
     color: #94a3b8;
 }
+
+
+/* ───────────── RESPONSIVE SIDEBAR ───────────── */
+
+/* Tablets */
+@media (max-width: 1200px) {
+    .po-right-sidebar {
+        width: 260px;
+        padding: 20px;
+    }
+}
+
+/* Mobile: Sidebar becomes full width BELOW content */
+@media (max-width: 992px) {
+    .po-right-sidebar {
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid #f1f5f9;
+    }
+}

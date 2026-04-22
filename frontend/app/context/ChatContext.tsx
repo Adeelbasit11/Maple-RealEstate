@@ -41,6 +41,7 @@ interface ChatContextType {
 
     joinRoom: (roomId: string) => void;
     sendMessage: (content: string) => void;
+    sendVoiceMessage: (audioBlob: Blob, duration: number) => Promise<void>;
     editMessage: (messageId: string, content: string) => void;
     deleteMessage: (messageId: string) => void;
     startTyping: () => void;
@@ -80,6 +81,7 @@ const ChatContext = createContext<ChatContextType>({
     friendRequests: [],
     joinRoom: () => {},
     sendMessage: () => {},
+    sendVoiceMessage: async () => {},
     editMessage: () => {},
     deleteMessage: () => {},
     startTyping: () => {},
@@ -534,6 +536,40 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         [currentRoom]
     );
 
+    // Send voice message via Socket.IO (bypasses HTTP cookie/CORS issues)
+    const sendVoiceMessage = useCallback(
+        async (audioBlob: Blob, duration: number) => {
+            if (!socketRef.current || !currentRoom) return;
+            try {
+                // Convert blob to base64 for socket transmission
+                const arrayBuffer = await audioBlob.arrayBuffer();
+                const base64 = btoa(
+                    new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
+                );
+
+                socketRef.current.emit(
+                    "chat:voice-upload",
+                    {
+                        roomId: currentRoom.id,
+                        audioData: base64,
+                        duration,
+                    },
+                    (response: { success: boolean; audioUrl?: string; error?: string }) => {
+                        if (response.success && response.audioUrl) {
+                            // Voice message saved & broadcast by backend
+                            console.log("Voice message sent successfully");
+                        } else {
+                            console.error("Voice upload failed:", response.error);
+                        }
+                    }
+                );
+            } catch (error) {
+                console.error("Failed to send voice message:", error);
+            }
+        },
+        [currentRoom]
+    );
+
     // Edit a message
     const editMessage = useCallback(
         (messageId: string, content: string) => {
@@ -671,6 +707,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 friendRequests,
                 joinRoom,
                 sendMessage,
+                sendVoiceMessage,
                 editMessage,
                 deleteMessage,
                 startTyping,

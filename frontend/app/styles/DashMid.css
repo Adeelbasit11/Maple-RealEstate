@@ -451,3 +451,122 @@
     transform: translateY(-2px);
     transition: 0.2s;
 }
+
+
+/* ================= RESPONSIVE ================= */
+
+/* Large Tablets / Small Laptops */
+@media (max-width: 1200px) {
+    .mid-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .search-bar {
+        width: 100%;
+    }
+
+    .active-users-top {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .main-bar-chart {
+        margin-left: 0;
+        width: 100%;
+        height: 250px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* Tablets */
+@media (max-width: 768px) {
+    .dash-mid {
+        padding: 20px;
+    }
+
+    .mid-header h2 {
+        font-size: 20px;
+    }
+
+    .active-count {
+        font-size: 40px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .active-users-info {
+        flex: unset;
+    }
+
+    .mini-chart {
+        width: 100%;
+    }
+
+    .sales-chart-card {
+        padding: 20px;
+    }
+
+    .chart-body {
+        flex-direction: column;
+        height: auto;
+        gap: 20px;
+    }
+
+    .y-axis-labels {
+        flex-direction: row;
+        justify-content: space-between;
+        padding-right: 0;
+        overflow-x: auto;
+    }
+}
+
+
+/* Mobile */
+@media (max-width: 480px) {
+    .dash-mid {
+        padding: 15px;
+    }
+
+    .mid-header {
+        gap: 15px;
+    }
+
+    .header-title-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .search-bar {
+        padding: 10px 16px;
+    }
+
+    .active-users-card {
+        padding: 20px;
+    }
+
+    .main-bar-chart {
+        height: 200px;
+        padding: 15px;
+    }
+
+    .stat-box {
+        padding: 16px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+    }
+
+    .active-count {
+        font-size: 32px;
+    }
+}

@@ -349,6 +349,15 @@
     background: #f5f0ff;
 }
 
+.photo-upload-zone.drag-active {
+    background: #ede9fe;
+    border-color: #7c3aed;
+    border-style: solid;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
 .upload-icon-circle {
     width: 44px;
     height: 44px;

@@ -90,17 +90,23 @@ export async function addMessage(
     senderName: string,
     senderAvatar: string,
     content: string,
-    type: "text" | "system" = "text"
+    type: "text" | "system" | "voice" = "text",
+    audioUrl?: string,
+    audioDuration?: number
 ) {
+    const insertData: any = {
+        room_id: roomId,
+        sender_id: type === "system" ? null : senderId,
+        sender_name: senderName,
+        sender_avatar: senderAvatar,
+        content,
+        type,
+    };
+    if (audioUrl) insertData.audio_url = audioUrl;
+    if (audioDuration !== undefined) insertData.audio_duration = audioDuration;
+
     const [message] = await db("chat_messages")
-        .insert({
-            room_id: roomId,
-            sender_id: type === "system" ? null : senderId,
-            sender_name: senderName,
-            sender_avatar: senderAvatar,
-            content,
-            type,
-        })
+        .insert(insertData)
         .returning("*");
 
     return {
@@ -111,8 +117,10 @@ export async function addMessage(
         senderAvatar: message.sender_avatar,
         content: message.content,
         timestamp: message.timestamp,
-        type: message.type as "text" | "system",
+        type: message.type as "text" | "system" | "voice",
         isEdited: message.is_edited,
+        audioUrl: message.audio_url || undefined,
+        audioDuration: message.audio_duration || undefined,
     };
 }
 
@@ -153,8 +161,10 @@ export async function getRoomMessages(roomId: string) {
         senderAvatar: m.senderAvatar || m.sender_avatar,
         content: m.content,
         timestamp: m.timestamp,
-        type: m.type as "text" | "system",
+        type: m.type as "text" | "system" | "voice",
         isEdited: m.isEdited !== undefined ? m.isEdited : m.is_edited,
+        audioUrl: m.audio_url || undefined,
+        audioDuration: m.audio_duration || undefined,
     }));
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -11,18 +11,45 @@ import {
     FileText,
     ChevronDown,
     Menu,
-    X
+    X,
+    MoreVertical
 } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
 
 import "../../../styles/DashLeftSideBar.css";
 
 const DashLeftSideBar = () => {
     const pathname = usePathname();
+    const { user } = useAuth();
     const [openMenu, setOpenMenu] = useState<string | null>("home");
     const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
 
     // sidebar toggle for mobile/tablet
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+
+    // close sidebar on route change (mobile navigation)
+    useEffect(() => {
+        closeSidebar();
+    }, [pathname, closeSidebar]);
+
+    // close on Escape key & lock body scroll when open
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") closeSidebar();
+        };
+        if (sidebarOpen) {
+            document.addEventListener("keydown", handleKey);
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.removeEventListener("keydown", handleKey);
+            document.body.style.overflow = "";
+        };
+    }, [sidebarOpen, closeSidebar]);
 
     const toggleMenu = (menu: string) => {
         setOpenMenu(openMenu === menu ? null : menu);
@@ -320,6 +347,33 @@ const DashLeftSideBar = () => {
                     </div>
 
                 </nav>
+
+                {/* USER PROFILE CARD */}
+                {user && (
+                    <div className="sidebar-user-card">
+                        <div className="sidebar-user-avatar">
+                            {user.profileImage ? (
+                                <img src={user.profileImage} alt={user.name} />
+                            ) : (
+                                <img
+                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                        [user.name, user.lastName].filter(Boolean).join(" ")
+                                    )}&background=7c3aed&color=fff&size=80`}
+                                    alt={user.name}
+                                />
+                            )}
+                        </div>
+                        <div className="sidebar-user-info">
+                            <span className="sidebar-user-name">
+                                {[user.name, user.lastName].filter(Boolean).join(" ")}
+                            </span>
+                            <span className="sidebar-user-email">{user.email}</span>
+                        </div>
+                        <button className="sidebar-user-menu-btn">
+                            <MoreVertical size={16} />
+                        </button>
+                    </div>
+                )}
             </aside>
         </>
     );

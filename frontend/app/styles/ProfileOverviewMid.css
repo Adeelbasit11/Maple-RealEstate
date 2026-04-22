@@ -227,3 +227,104 @@
     font-size: 11px;
     color: #94a3b8;
 }
+
+
+/* ───────────────── RESPONSIVE DESIGN ───────────────── */
+
+/* Large Tablets */
+@media (max-width: 1200px) {
+    .po-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .po-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .po-secondary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .po-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tablets */
+@media (max-width: 992px) {
+    .po-mid-container {
+        padding: 20px;
+    }
+
+    .po-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .po-search-bar {
+        width: 100%;
+    }
+
+    .po-stats-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .po-mid-container {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .po-title {
+        font-size: 18px;
+    }
+
+    .po-card {
+        padding: 16px;
+    }
+
+    .po-stat-value {
+        font-size: 18px;
+    }
+
+    .po-stat-chart-container {
+        width: 50px;
+        height: 40px;
+    }
+
+    .po-card-title {
+        font-size: 14px;
+    }
+
+    /* Charts height adjust */
+    .po-main-grid .po-card div[style],
+    .po-secondary-grid .po-card div[style],
+    .po-bottom-grid .po-card div[style] {
+        height: 180px !important;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .po-mid-container {
+        padding: 12px;
+    }
+
+    .po-stat-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .po-stat-info {
+        text-align: left;
+        width: 100%;
+    }
+
+    .po-stat-value {
+        justify-content: flex-start;
+    }
+}

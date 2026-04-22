@@ -333,3 +333,150 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+/* gpt responsiveness  */
+
+/* ─────────────────────────────────────────
+   RESPONSIVE DESIGN - NEW PRODUCT PAGE
+───────────────────────────────────────── */
+
+/* Fix search icon (remove hard margin bug) */
+.new-product-search .search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+/* Improve form width globally */
+.product-form-card {
+    max-width: 900px;
+    width: 100%;
+}
+
+/* ───────────── TABLET (≤ 1200px) ───────────── */
+@media (max-width: 1200px) {
+    .product-form-card {
+        max-width: 100%;
+    }
+}
+
+/* ───────────── TABLET (≤ 992px) ───────────── */
+@media (max-width: 992px) {
+    .new-product-page {
+        padding: 20px;
+    }
+
+    .new-product-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .new-product-search {
+        width: 100%;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+/* ───────────── MOBILE (≤ 768px) ───────────── */
+@media (max-width: 768px) {
+    .new-product-page {
+        padding: 14px;
+    }
+
+    .product-form-card {
+        padding: 20px 16px;
+        border-radius: 8px;
+    }
+
+    .product-form-card h3 {
+        font-size: 14px;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+
+    /* Stepper responsive */
+    .stepper {
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .stepper-line {
+        display: none;
+    }
+
+    .step {
+        background: #f3f4f6;
+        padding: 6px 10px;
+        border-radius: 20px;
+    }
+
+    .step-label {
+        font-size: 12px;
+    }
+
+    /* Buttons full width */
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-next,
+    .btn-prev {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .btn-prev {
+        margin-right: 0;
+    }
+}
+
+/* ───────────── SMALL MOBILE (≤ 480px) ───────────── */
+@media (max-width: 480px) {
+    .new-product-page {
+        padding: 12px;
+    }
+
+    .step {
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .step-number {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+    }
+
+    .step-label {
+        font-size: 10px;
+    }
+
+    .dropzone {
+        padding: 24px 12px;
+    }
+
+    .dropzone-icon img {
+        width: 36px;
+        height: 36px;
+    }
+
+    .dropzone-text {
+        font-size: 12px;
+    }
+}

@@ -1,7 +1,7 @@
 .left-sidebar {
     min-width: 260px;
     background-color: #f9fafb;
-    height: auto;
+    height: 100vh;
     padding: 20px 14px;
     display: flex;
     flex-direction: column;
@@ -159,34 +159,127 @@
  */
 
 /* =============================
-   MOBILE RESPONSIVE SIDEBAR
+   SIDEBAR USER PROFILE CARD
 ============================= */
+
+.sidebar-user-card {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: #fff;
+    cursor: default;
+    position: relative;
+    box-shadow: 0 4px 18px rgba(124, 58, 237, 0.30);
+    transition: box-shadow 0.2s;
+}
+
+.sidebar-user-card:hover {
+    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.40);
+}
+
+.sidebar-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.sidebar-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebar-user-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-email {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-menu-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.sidebar-user-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
 
 /* =============================
    MOBILE RESPONSIVE SIDEBAR
 ============================= */
 
-/* toggle button */
+/* toggle (hamburger) button — hidden on desktop */
 .sidebar-toggle-btn {
     position: fixed;
-    top: 15px;
-    left: 15px;
+    top: 14px;
+    left: 14px;
     z-index: 1100;
     border: none;
-    background: white;
-    padding: 8px;
-    border-radius: 8px;
+    background: #fff;
+    padding: 9px 10px;
+    border-radius: 10px;
     cursor: pointer;
     display: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    color: #7c3aed;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.sidebar-toggle-btn:hover {
+    background: #f3f0ff;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.18);
 }
 
 /* overlay */
 .sidebar-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1050;
+    animation: fadeInOverlay 0.25s ease;
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* sidebar top */
@@ -196,36 +289,102 @@
     align-items: center;
 }
 
-/* close btn */
+/* close btn — hidden on desktop */
 .close-btn {
     border: none;
     background: none;
     cursor: pointer;
     display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 8px;
+    color: #555;
+    transition: background 0.2s, color 0.2s;
 }
 
-/* tablet & mobile */
+.close-btn:hover {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+/* =============================
+   TABLET & MOBILE  (<=1024px)
+============================= */
 @media (max-width: 1024px) {
 
     .sidebar-toggle-btn {
-        display: block;
+        display: flex;
     }
 
     .left-sidebar {
         position: fixed;
         top: 0;
-        left: -260px;
-        height: 100%;
+        left: 0;
+        width: 270px;
+        min-width: 270px;
+        height: 100vh !important;
         z-index: 1101;
-        transition: left 0.3s ease;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         background: #f9fafb;
+        box-shadow: none;
     }
 
     .left-sidebar.open {
-        left: 0;
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
     }
 
     .close-btn {
-        display: block;
+        display: flex;
+    }
+
+    .logo-container {
+        padding: 10px 10px 20px 10px;
+    }
+}
+
+/* =============================
+   SMALL PHONES  (<=480px)
+============================= */
+@media (max-width: 480px) {
+
+    .left-sidebar {
+        width: 260px;
+        min-width: 260px;
+        padding: 16px 10px;
+    }
+
+    .sidebar-toggle-btn {
+        top: 10px;
+        left: 10px;
+        padding: 8px 9px;
+    }
+
+    .menu-link {
+        font-size: 13px;
+    }
+
+    .submenu-link {
+        font-size: 13px;
+        padding: 7px 12px 7px 30px;
+    }
+
+    .nested-link {
+        font-size: 13px;
+        padding: 7px 12px 7px 48px;
+    }
+
+    .sidebar-user-card {
+        padding: 12px 14px;
+    }
+
+    .sidebar-user-name {
+        font-size: 12px;
+    }
+
+    .sidebar-user-email {
+        font-size: 10px;
     }
 }

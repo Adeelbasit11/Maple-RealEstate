@@ -38,15 +38,11 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    border: 2px solid var(--chat-bg-secondary);
-    background: var(--chat-online-green);
-    box-shadow: 0 0 6px var(--chat-online-glow);
-    animation: chatPulse 2s ease-in-out infinite;
+    border: 2px solid var(--chat-bg-white, #fff);
+    background: #22c55e;
 }
 .chat-avatar-status-dot.offline {
-    background: var(--chat-offline-gray);
-    box-shadow: none;
-    animation: none;
+    background: #d1d5db;
 }
 .chat-avatar-status-dot.size-sm {
     width: 8px;

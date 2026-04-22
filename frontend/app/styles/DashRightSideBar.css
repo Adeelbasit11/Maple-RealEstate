@@ -412,3 +412,46 @@
     font-size: 11px;
     color: #9ca3af;
 }
+
+/* ================= RESPONSIVE ================= */
+
+/* Hide sidebar on small tablets */
+@media (max-width: 1024px) {
+    .right-sidebar {
+        width: 260px;
+        padding: 30px 20px;
+    }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    .right-sidebar {
+        position: fixed;
+        right: -100%;
+        top: 0;
+        height: 100%;
+        z-index: 1000;
+        width: 280px;
+        transition: 0.3s;
+    }
+
+    .right-sidebar.open {
+        right: 0;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .right-sidebar {
+        width: 100%;
+    }
+
+    .earning-amount {
+        font-size: 28px;
+    }
+
+    .withdraw-btn {
+        padding: 10px;
+        font-size: 12px;
+    }
+}

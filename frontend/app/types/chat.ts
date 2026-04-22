@@ -2,6 +2,7 @@ export interface ChatUser {
     id: string;
     username: string;
     name?: string;
+    email?: string;
     avatar: string;
     isOnline?: boolean;
     lastSeen?: string;
@@ -15,9 +16,11 @@ export interface ChatMessage {
     senderAvatar: string;
     content: string;
     timestamp: string;
-    type: "text" | "system";
+    type: "text" | "system" | "voice";
     isEdited?: boolean;
     isRead?: boolean;
+    audioUrl?: string;
+    audioDuration?: number;
 }
 
 export interface ChatRoom {

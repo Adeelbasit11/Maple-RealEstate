@@ -56,19 +56,48 @@ const AccountSetting = () => {
         e.stopPropagation();
         setDragActive(false);
         const file = e.dataTransfer.files?.[0];
-        if (file) {
-            setPhotoFile(file);
-            setPhotoPreview(URL.createObjectURL(file));
+        if (file) processFile(file);
+    };
+
+    const isValidImage = (file: File) => {
+        const validTypes = ["image/svg+xml", "image/png", "image/jpeg", "image/gif", "image/webp"];
+        return validTypes.includes(file.type);
+    };
+
+    const processFile = (file: File) => {
+        if (!isValidImage(file)) {
+            error("Please upload a valid image (SVG, PNG, JPG, GIF or WebP)");
+            return;
         }
+        setPhotoFile(file);
+        setPhotoPreview(URL.createObjectURL(file));
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            setPhotoFile(file);
-            setPhotoPreview(URL.createObjectURL(file));
-        }
+        if (file) processFile(file);
     };
+
+    // Clipboard paste handler
+    useEffect(() => {
+        const handlePaste = (e: ClipboardEvent) => {
+            const items = e.clipboardData?.items;
+            if (!items) return;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.startsWith("image/")) {
+                    e.preventDefault();
+                    const file = items[i].getAsFile();
+                    if (file) {
+                        processFile(file);
+                        success("Image pasted successfully!");
+                    }
+                    break;
+                }
+            }
+        };
+        document.addEventListener("paste", handlePaste);
+        return () => document.removeEventListener("paste", handlePaste);
+    }, []);
 
     const handleSave = async () => {
         setSaving(true);
@@ -315,8 +344,8 @@ const AccountSetting = () => {
                             ) : (
                                 <p>
                                     <span className="link-text">Click to upload</span> or drag and drop<br />
-                                    SVG, PNG, JPG or GIF<br />
-                                    (max. 800x400px)
+                                    or <strong>paste</strong> from clipboard<br />
+                                    SVG, PNG, JPG or GIF (max. 800×400px)
                                 </p>
                             )}
                             <input

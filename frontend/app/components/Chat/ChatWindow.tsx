@@ -4,18 +4,34 @@ import { useEffect, useRef } from "react";
 import { useChat } from "../../context/ChatContext";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
-import DirectMessageWindow from "./DirectMessageWindow";
 import "../../styles/chat-window.css";
+
+function formatDateSeparator(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+
+    if (isToday) return "Today";
+    if (isYesterday) return "Yesterday";
+    return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: undefined });
+}
+
+function shouldShowDateSeparator(currentTimestamp: string, prevTimestamp?: string): boolean {
+    if (!prevTimestamp) return true;
+    const curr = new Date(currentTimestamp).toDateString();
+    const prev = new Date(prevTimestamp).toDateString();
+    return curr !== prev;
+}
 
 export default function ChatWindow() {
     const {
         currentRoom,
-        currentDirectChat,
         messages,
         typingUsers,
         currentUser,
-        isConnected,
-        onlineUsers,
     } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -27,46 +43,23 @@ export default function ChatWindow() {
         scrollToBottom();
     }, [messages]);
 
-    // If in direct message mode, show DirectMessageWindow
-    if (currentDirectChat) {
-        return <DirectMessageWindow />;
-    }
-
     if (!currentRoom) {
         return (
             <div className="chat-no-room-selected">
                 <div className="chat-no-room-icon">💬</div>
-                <div className="chat-no-room-title">Welcome to Chat</div>
-                <div className="chat-no-room-subtitle">Select a channel to start chatting</div>
+                <div className="chat-no-room-title">Select a channel</div>
+                <div className="chat-no-room-subtitle">Choose a group from the sidebar to start chatting</div>
             </div>
         );
     }
 
     return (
         <div className="chat-window">
-            {/* Header */}
-            <div className="chat-header">
-                <div className="chat-header-icon">{currentRoom.icon}</div>
-                <div className="chat-header-info">
-                    <div className="chat-header-name">{currentRoom.name}</div>
-                    <div className="chat-header-desc">{currentRoom.description}</div>
-                </div>
-                <div className="chat-header-online">
-                    <div className={`chat-connection-status ${isConnected ? "online" : "offline"}`}>
-                        <div className="chat-connection-dot" />
-                        <span>{isConnected ? "Connected" : "Disconnected"}</span>
-                    </div>
-                    <div className="chat-online-count">
-                        {onlineUsers.length} online
-                    </div>
-                </div>
-            </div>
-
             {/* Messages */}
             <div className="chat-messages">
                 {messages.length === 0 ? (
                     <div className="chat-empty">
-                        <div className="chat-empty-icon">🎉</div>
+                        <div className="chat-empty-icon">💬</div>
                         <div className="chat-empty-text">No messages yet</div>
                         <div className="chat-empty-sub">Be the first to send a message!</div>
                     </div>
@@ -77,14 +70,28 @@ export default function ChatWindow() {
                             !prevMsg ||
                             prevMsg.senderId !== msg.senderId ||
                             prevMsg.type === "system";
+                        const showDate = shouldShowDateSeparator(
+                            msg.timestamp,
+                            prevMsg?.timestamp
+                        );
 
                         return (
-                            <MessageBubble
-                                key={msg.id}
-                                message={msg}
-                                isSent={msg.senderId === currentUser?.id}
-                                showSender={showSender}
-                            />
+                            <div key={msg.id}>
+                                {showDate && (
+                                    <div className="chat-date-separator">
+                                        <div className="chat-date-line" />
+                                        <span className="chat-date-text">
+                                            {formatDateSeparator(msg.timestamp)}
+                                        </span>
+                                        <div className="chat-date-line" />
+                                    </div>
+                                )}
+                                <MessageBubble
+                                    message={msg}
+                                    isSent={msg.senderId === currentUser?.id}
+                                    showSender={showSender}
+                                />
+                            </div>
                         );
                     })
                 )}
